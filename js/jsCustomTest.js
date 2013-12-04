@@ -59,7 +59,7 @@ var userTest = {
 
         if (userTest.targetDiv[0] == undefined) {
             throw "Exception: Can not find DIV to render quiz. " +
-                "Current setting is: 'targetDiv': '" + userTest.settings.targetDiv + "'";
+                "Current setting is: 'targetDiv': '" + userTest.settings.targetDiv + "'.";
         }
 
         // Substring filename to get its extension
@@ -959,8 +959,8 @@ var userTest = {
         var twiLogo = $(document.createElement("img")).attr('src', "images/twitter.png"),
             twiLinkHref = "http://twitter.com/share?text=" + encodeURIComponent(userTest.resultVariantObject.twitter),
             twiLink = $(document.createElement("a")).attr({
-                'href': twiLinkHref,
-                'id': 'twitterLink'
+                "href": twiLinkHref,
+                "id": 'twitterLink'
             });
 
         twiLink.append(twiLogo);
@@ -975,8 +975,8 @@ var userTest = {
     getFBPostButton: function () {
         var fb = $(document.createElement("img")).attr('src', "images/fb.png").on("click", function () {
             $.post(userTest.settings.formListener, {
-                result: userTest.resultVariant,
-                reason: "fb"
+                "result": userTest.resultVariant,
+                "reason": "fb"
             })
         });
 
