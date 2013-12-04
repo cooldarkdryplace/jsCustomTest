@@ -6,9 +6,10 @@ JS Custom test is a universal quiz script that can be used for many purposes.
     • Psychological tests
     • Goods filter
     • Simple polling script
+    • Sorting instrument
 
 There are three algorithms that can be used to calculate result.
-    1) Points sum
+    1) Points sum ("score")
     Each answer has points. Sum of all points is used to determine which result to show
         Example:
             Question 1: How old are you?
@@ -16,65 +17,88 @@ There are three algorithms that can be used to calculate result.
                 Answer 2: 21 (10 points)
                 Answer 3: 35 (15 points)
 
-            Result 1 (points 0-5) : You are young and ambitious.
-            Result 2 (points 6-10): You are young but you can buy alcohol.
-            Result 3 (points 11-15): You are young but it;s time to stop drinking, seriously.
+            Question 2: How old is your brother?
+                Answer 1: 18 (5 points)
+                Answer 2: 21 (10 points)
+                Answer 3: 35 (15 points)
 
-    2) Popular variant (Max)
+            Result 1 (points 0-10) : You are young and ambitious.
+            Result 2 (points 11-20): You are young and you can buy alcohol.
+            Result 3 (points 21-30): You are young but it's time to stop drinking, seriously.
+            Default result: In case range is exceeded this result will show up.
+
+    2) Popular variant ("popular")
     Each answer has an identifier. After quiz is passed script calculates what identifier is the most popular and shows a result with same identifier.
-    Question 1: How old are you?
-        Answer 1: 18 (name “a”)
-        Answer 2: 21 (name “b”)
-        Answer 3: 35 (name “c”)
-    Result 1 (name “a”) : You are young and ambitious.
-    Result 2 (name “b”): You are young but you can buy alcohol.
-    Result 3 (name “c”): You are young but it;s time to stop drinking, seriously.
+        Example:
+            Question 1: How was your day?
+                Answer 1: Sold quiz script! (name “red_code”)
+                Answer 2: Refactored some code (name “yellow_code”)
+                Answer 3: Did nothing (name “black_code”)
+
+            Result 1 (name “red_code”) : He-he-he, nice.
+            Result 2 (name “yellow_code”): That's the spirit!
+            Result 3 (name “black_code”): I am not satisfied with your behaviour!
+            Default result: will never happen.
+
+    Note that if there are two or more variants with the same popularity script will show first matching result.
 
     3) Answers combination
     Each answer has a unique identifier. After quiz is passed you have a string which matches a result with a same string.
-    Question 1: What is your name?
-        Answer 1: Jack (id “jk”)
-        Answer 2: Max ( id “mx”)
-        Answer 3: John ( id “jn”)
-    Question 1: Where are you from?
-        Answer 1: London ( id “ln”)
-        Answer 2: Sydney ( id “sy”)
-        Answer 3: Paris ( id “ps”)
-    Result 1 ( id “jkln”) : You are Jack from London.
-    Result 2 ( id “mxps”): You are Max from Sydney.
-    Result 3 ( id “jkps”): You are Jack from Paris.
+        Example:
+            Question 1: What is your name?
+                Answer 1: Jack (id “jack_”)
+                Answer 2: Max ( id “max_”)
+                Answer 3: Hugo ( id “hugo_”)
+
+            Question 1: Where are you from?
+                Answer 1: London ( id “london”)
+                Answer 2: Sydney ( id “sydney”)
+                Answer 3: Paris ( id “paris”)
+
+            Result 1 ( id “jack_london”) : Thank you a lot John Griffith Chaney! Martin Eden is a great novel.
+            Result 2 ( id “max_sydney”): You are Max from Sydney.
+            Result 3 ( id “hugo_paris”): You are Jack from Paris.
+            Default result: any other combination that was not described in "predefined" results will lead to this option.
 
 After all questions are answered script can act in different ways.
     • Generate a page with result text paragraph, and optional links.
     • Silently send result using AJAX and delete itself.
     • Redirect to another page.
+    • Use a source HTML file to render result page.
 
-How to add script to your page
+
+HOW TO ADD SCRIPT TO YOUR PAGE
+
     1. Copy files
     2. Edit HTML header
     3. Insert a DIV to your page
 
-1) Copy file “jsCustomTest.xml” and “css”, “images”, “js” folders to a directory with your HTML file, where you want to show test.
+1) Copy file “jsCustomTest.xml” and “css”, “images”, “lib”, “js” folders to a directory with your HTML file, where you want to show test.
+
 2) Edit your HTML header. Add this code inside <head></head> tags of your HTML file:
-    <link rel="stylesheet" type="text/css" href="css/reset.css" />
-    <link rel="stylesheet" type="text/css" href="css/style.css" />
-    <script type="text/javascript" src="js/jquery-1.8.0.min.js"></script>
-    <script type="text/javascript" src="js/jsCustomTest-min.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/reset.css"/>
+    <link rel="stylesheet" type="text/css" href="css/style.css"/>
+    <script type="text/javascript" src="lib/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="js/jsCustomTest.js"></script>
+
 3) Insert a blank DIV with id=”jsCustomTest” to your HTML page.
     Example: <div id=”jsCustomTest”></div>
-
-And a JS Custom Test will draw itself there.
+    And a JS Custom Test will draw itself there.
 
 
 HOW TO EDIT DATA
 
-There are two ways to edit your quiz questions, answers and results.
-    • Use XML generator that is included. You will need installed JRE (Java Runtime Environment) to use generator. JRE can be downloaded here:
-  http://www.oracle.com/technetwork/java/javase/downloads/index.html
-    • Manually edit XML in a text editor.
+There are two supported formats to store your questions, answers and results.
+    • XML
+    • JSON
 
-Information for manual XML editing
-    1) All text data saved in one "jsCustomTest .xml" file. Edit jsCustomTest.xml to use your own questions, answers and results.
+    Both are standard formats. I suggest using text editors which support this formats and will analyse document structure.
+    You can also use instruments to validate you data files before deploying to server:
+        JSON - http://jsonlint.com/
+        XML - http://www.w3schools.com/xml/xml_validator.asp
+
+XML editing tips:
+    1) All text data saved in one "jsCustomTest.xml" file. Edit jsCustomTest.xml to use your own questions, answers and results.
     Do not forget that in XML file you can't use special symbols use equivalents:
         &amp; (&)
         &lt; (<)
@@ -105,55 +129,84 @@ Information for manual XML editing
         If you are using this test to help your customers with choosing a perfume you can add links to goods that your customer will enjoy.
 
     4) You can use your own design using CSS, most of elements have they ID's for your convenience.
+        Result pages may be fully customized if you will use HTML pages as a result option is script settings.
 
     5) Adding and removing questions, answers and results are pretty simple.
         Here is the example of question with answers:
-            <question name="color">
+            <question>
                 <text>What color do you prefer?</text>
                 <picture>images/questions/qst_2.png</picture>
                 <answers>
-                    <answer name="1" score="5" comb="likes_">Light blue</answer>
+                    <answer name="fresh" score="5" comb="likes_">Light blue</answer>
                     <answer name="2" score="10" comb="hates_">Yellow</answer>
                     <answer name="3" score="15" comb="loves_">Violet</answer>
                     <answer name="4" score="20" comb="prefers_">Red</answer>
                 </answers>
             </question>
 
-        Picture link is optional. If you don't use picture for a question don't put any text between <picture></picture> tags.
+        Picture is optional. If you don't use picture for a question don't put any text between <picture></picture> tags.
         Each answer has three attributes. Depending on selected algorithm script will use one of them.
-        If you are using “popular” algorithm you'll need to “name” attribute. “comb” is used for combination algorithm and score for “points”. Just leave blank attribute you don't need. (name=””).
+        If you are using “popular” algorithm you'll need to “name” attribute. “comb” is used for combination algorithm and score for “points”. Just leave blank attribute you don't need it. (name=””).
 
         Here is the example of result:
-            <result name="1" minscore="0" maxscore="10" comb="comb_example_text">
+
+            <result name="fresh" minScore="0" maxScore="10" comb="combination_of_identifiers_here">
                 <redirect>http://www.example.com/redirect_1</redirect>
-                <text>Result text here.</text>
-                <twitter>Tweet text here.</twitter>
+                <text>You are very sweet and romantic person. Floral scents are well suited to you. Choosing a perfume,
+                    remember that they must be very soft and unobtrusive. Only you and people close to you should be aware
+                    that you use perfume.
+                </text>
+                <HTMLPage>html_results/fresh.html</HTMLPage>
+                <twitter>I'm sweet and romantic =) According to test results.</twitter>
                 <links>
                     <link>
-                        <linkText>Link name here</linkText>
+                        <linkText>Good Perfume</linkText>
                         <linkAddress>http://www.example.com/something_1.html</linkAddress>
                         <linkPicture>images/result/1.gif</linkPicture>
-                        <shortDescription>Your text here.</shortDescription>
+                        <shortDescription>Creating perfumes through reverse engineering with analytical techniques such as
+                            GC/MS can reveal the "general" formula for any particular perfume. The difficulty of GC/MS
+                            analysis arises due to the complexity of a perfume's ingredients.
+                        </shortDescription>
                     </link>
                     <link>
-                        <linkText>Link name here</linkText>
+                        <linkText>Another Good Perfume 1</linkText>
                         <linkAddress>http://www.example.com/something_2.html</linkAddress>
                         <linkPicture>images/result/2.gif</linkPicture>
-                        <shortDescription>Your text here.</shortDescription>
+                        <shortDescription>This is particularly due to the presence of natural essential oils and other
+                            ingredients consisting of complex chemical mixtures. However, "anyone armed with good GC/MS
+                            equipment and experienced in using this equipment can today, within days, find out a great deal
+                            about the formulation of any perfume... customers and competitors can analyze most perfumes more
+                            or less precisely."
+                        </shortDescription>
                     </link>
                 </links>
             </result>
 
-    Name is used for “popular” algorithm. “Minscore” and “maxScore” for “points” algorithm. “Comb” for combination algorithm.
-    You can use as much links as you want.
+    Name is used for “popular” algorithm. “minScore” and “maxScore” for “points” algorithm. “Comb” for combination algorithm.
+    You can use as much links as you want. HTMLPage tag includes reference to an HTML page for current result.
+    Only one DIV will be used from HTMLPage source - DIV with id="resultNode".
+    Example of HTMLPage:
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title></title>
+        </head>
+        <body>
+            <div id="resultNode">
+                <p>Fresh result</p>
+            </div>
+        </body>
+        </html>
+
+    Only <p>Fresh result</p> in this case will be used as a result.
+
 
 SETTINGS
 
 There are some simple settings that can be used to customize quiz behavior.
 
-        /**
-         * Common quiz settings
-         */
+    Common quiz settings:
+
         "dataFile": "jsCustomTest.xml",         // data file name must be on the same domain. XML or JSON format.
         "formListener": "submit.php",           // Script/Servlet name that listens for result data.
         "targetDiv": "jsCustomTest",            // Div where quiz will be build
@@ -165,11 +218,8 @@ There are some simple settings that can be used to customize quiz behavior.
         "calculation": "popular",               // "popular", "score", "comb"
         "resultPage": "default",                // "default", "redirect", "silent", "HTMLPage"
 
-        /**
-         * Settings for result page
-         * generated by script
-         * "resultPage": "default"
-         */
+    Settings for result page generated by script "resultPage": "default":
+
         "resultLinks": true,                    // Show result links or don't
         "linksInNewPage": false,                // Open links in new page
         "resultParagraph": true,                // Show result text or don't
@@ -180,10 +230,14 @@ There are some simple settings that can be used to customize quiz behavior.
             "getFBPostButton": true                 // show Facebook button
         },
 
-        /**
-         * Settings for "resultPage": "silent"
-         */
+    Settings for "resultPage": "silent":
+
         "selfDestruction": {
             "enabled": true,                        // Delete quiz div from DOM after complete. (Works only if "resultPage" is set to "silent")
             "destructionTimer": 5000                // Time before self-destruction initiated in ms. 1000ms = 1 second.
         }
+
+If you have questions or ideas - feel free to send me a letter:
+    xmapact@gmail.com
+
+Thanks for your purchase!
