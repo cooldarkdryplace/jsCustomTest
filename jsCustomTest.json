@@ -1,0 +1,163 @@
+{
+    "test": {
+        "local": {
+            "name": "Find your Perfume",
+            "header": "Questions to go:",
+            "resultHeader": "Result:",
+            "backButtonText": "Repeat test",
+            "formSubmit": "Email result",
+            "silentResult": "Thanks!",
+            "loadingText": "Sending results...",
+            "formSubmitText": "Email sent!"
+        },
+        "questions": [
+            {
+                "questionText": "Is that first question text?",
+                "pictureSource": "images/questions/qst_1.png",
+                "answers": [
+                    {
+                        "answerText": "That is the first answer for the first question",
+                        "score": 0,
+                        "name": "a1",
+                        "comb": "#comb_1_1#"
+                    },
+                    {
+                        "answerText": "That is the second answer for the first question",
+                        "score": 5,
+                        "name": "a2",
+                        "comb": "#comb_1_2#"
+                    },
+                    {
+                        "answerText": "That is the third answer for the first question",
+                        "score": 10,
+                        "name": "a3",
+                        "comb": "#comb_1_3#"
+                    },
+                    {
+                        "answerText": "That is the fourth answer for the first question",
+                        "score": 15,
+                        "name": "a4",
+                        "comb": "#comb_1_4#"
+                    }
+                ]
+            },
+            {
+                "questionText": "Is that first question text?",
+                "pictureSource": "images/questions/qst_1.png",
+                "answers": [
+                    {
+                        "answerText": "That is the first answer for the second question",
+                        "score": 15,
+                        "name": "a1",
+                        "comb": "#comb_2_1#"
+                    },
+                    {
+                        "answerText": "That is the second answer for the second question",
+                        "score": 5,
+                        "name": "a2",
+                        "comb": "#comb_2_2#"
+                    },
+                    {
+                        "answerText": "That is the third answer for the second question",
+                        "score": 0,
+                        "name": "a3",
+                        "comb": "#comb_2_3#"
+                    },
+                    {
+                        "answerText": "That is the fourth answer for the second question",
+                        "score": 10,
+                        "name": "a4",
+                        "comb": "#comb_2_4#"
+                    }
+                ]
+            },
+            {
+                "questionText": "Is that first question text?",
+                "pictureSource": "images/questions/qst_1.png",
+                "answers": [
+                    {
+                        "answerText": "That is the first answer for the third question",
+                        "score": 0,
+                        "name": "a1",
+                        "comb": "#comb_3_1#"
+                    },
+                    {
+                        "answerText": "That is the second answer for the third question",
+                        "score": 5,
+                        "name": "a2",
+                        "comb": "#comb_3_2#"
+                    },
+                    {
+                        "answerText": "That is the third answer for the third question",
+                        "score": 10,
+                        "name": "a3",
+                        "comb": "#comb_3_3#"
+                    },
+                    {
+                        "answerText": "That is the fourth answer for the third question",
+                        "score": 15,
+                        "name": "a4",
+                        "comb": "#comb_3_4#"
+                    }
+                ]
+            }
+        ],
+        "results": {
+            "a1": {
+                "minScore": 0,
+                "maxScore": 5,
+                "comb": "#comb_1_1##comb_2_3##comb_3_1#",
+                "redirect": "http://www.example.com/redirect_1",
+                "text": "First result text here",
+                "HTMLPage": "html_results/result_a1.html",
+                "twitter": "Your twitter message here",
+                "links": [
+                    {
+                        "linkText": "Link title 1",
+                        "linkAddress": "http://www.example.com/link_1",
+                        "linkPicture": "images/result/1.gif",
+                        "shortDescription": "First link description here"
+                    },
+                    {
+                        "linkText": "Link title 2",
+                        "linkAddress": "http://www.example.com/link_2",
+                        "linkPicture": "images/result/2.gif",
+                        "shortDescription": "Second link description here"
+                    },
+                    {
+                        "linkText": "Link title 3",
+                        "linkAddress": "http://www.example.com/link_3",
+                        "linkPicture": "images/result/3.gif",
+                        "shortDescription": "Third link description here"
+                    }
+                ]
+            },
+            "default": {
+                "redirect": "http://www.example.com/redirect_42",
+                "text": "Default result text here",
+                "HTMLPage": "html_results/default.html",
+                "twitter": "Your twitter message here",
+                "links": [
+                    {
+                        "linkText": "Link title 1",
+                        "linkAddress": "http://www.example.com/link_1",
+                        "linkPicture": "images/result/1.gif",
+                        "shortDescription": "First link description here"
+                    },
+                    {
+                        "linkText": "Link title 2",
+                        "linkAddress": "http://www.example.com/link_2",
+                        "linkPicture": "images/result/2.gif",
+                        "shortDescription": "Second link description here"
+                    },
+                    {
+                        "linkText": "Link title 3",
+                        "linkAddress": "http://www.example.com/link_3",
+                        "linkPicture": "images/result/3.gif",
+                        "shortDescription": "Third link description here"
+                    }
+                ]
+            }
+        }
+    }
+}

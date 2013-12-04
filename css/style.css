@@ -1,0 +1,209 @@
+@font-face {
+    font-family: 'Lato';
+    font-style: normal;
+    src: local('Lato Hairline'), local('Lato-Hairline'), url(http://themes.googleusercontent.com/static/fonts/lato/v6/boeCNmOCCh-EWFLSfVffDg.woff) format('woff');
+}
+
+body {
+    font-size: 13px;
+    font-family: 'Lato', sans-serif !important;
+    font-weight: 600;
+    -webkit-font-smoothing: antialiased;
+    background: #262626;
+}
+
+div#jsCustomTest {
+    width: 980px;
+    background: #fff;
+    margin: 1em auto;
+    padding: 2em;
+    border: 1px solid #eee;
+    color: #1F1F21;
+}
+
+div#jsCustomTest, p#resultPrgrph, button#backButton {
+    border-radius: .5em;
+    -webkit-background-clip: padding-box;
+}
+
+div.linkPictureDiv img, div#jsCustomTest {
+    -moz-box-shadow: 0px 0px .5em rgba(0, 0, 0, 0.5);
+    -webkit-box-shadow: 0px 0px .5em rgba(0, 0, 0, 0.5);
+    box-shadow: 0px 0px .5em rgba(0, 0, 0, 0.5);
+}
+
+div#jsCustomTest h2#testHeaderH2 {
+    font-size: 3em;
+    color: #FF3B30;
+    margin-bottom: 1em;
+    font-weight: 600;
+}
+
+div.question {
+    margin-bottom: .5em;
+}
+
+div.question_wrapper {
+    padding: .5em 1em;
+    border: 1px solid #eee;
+    border-top: none;
+    overflow: hidden;
+}
+
+div.question_wrapper img, div.question_wrapper ul {
+    float: left;
+}
+
+div.question img {
+    display: block;
+    padding: 12px;
+}
+
+div.question ul {
+    padding: .7em .14em .7em 2em;
+    list-style-type: none;
+    margin-bottom: .5em;
+}
+
+div.question ul li label {
+    margin-left: .5em;
+    font-weight: bold;
+}
+
+div.questionOdd .question_wrapper {
+    background: #F7F7F7;
+    border-color: #D7D7D7;
+}
+
+div.question h3 {
+    font-size: 1.3em;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 2em;
+    border: 1px solid #eee;
+    overflow: hidden;
+    height: 32px;
+    background: transparent url('../images/bg.png') repeat-x top left;
+}
+
+div.questionOdd h3 {
+    border-color: #E0E0E0;
+}
+
+div.question h3 span {
+    float: left;
+    display: block;
+    height: 100%;
+    background: #4CD964;
+    min-width: 30px;
+    *width: 30px;
+    text-align: center;
+    color: #1F1F21;
+    font-size: 1.3em;
+    padding-right: 20px;
+    margin-right: .5em;
+    -webkit-transition-property: background-color, color, width, padding-left, padding-right, padding-top, padding-bottom;
+    -webkit-transition-duration: 1s;
+    /*-webkit-transition-delay:1s;*/
+    -moz-transition-property: background-color, color, width, padding-left, padding-right, padding-top, padding-bottom;
+    -moz-transition-duration: 1s;
+    transition-property: background-color, color, width, padding-left, padding-right, padding-top, padding-bottom;
+    transition-duration: 1s;
+    /*transition-delay:1s;*/
+}
+
+div.question h3.answered span {
+    background-color: #FF2D55;
+}
+
+div#testResultDiv {
+    background: transparent;
+}
+
+p#resultPrgrph {
+    padding: .5em;
+    margin-bottom: .5em;
+    font-size: 1.3em;
+}
+
+#linksListDiv {
+    overflow: hidden;
+    min-width: 165px;
+}
+
+#linksListDiv ul#linksList {
+    list-style-type: none;
+}
+
+#linksListDiv ul#linksList li {
+    width: 48%;
+    margin-top: 2em;
+    margin-left: 2%;
+    display: inline-block;
+    vertical-align: top;
+}
+
+#linksListDiv ul#linksList li h3 {
+    font-size: 1.5em;
+    margin-bottom: .5em;
+}
+
+#linksListDiv ul#linksList li h3 a {
+    color: #007AFF;
+    text-decoration: none;
+}
+
+#linksListDiv ul#linksList li h3 a:hover {
+    color: #FF3B30;
+    text-decoration: underline;
+}
+
+div.linkPictureDiv {
+    min-height: 120px;
+    height: 120px;
+    padding: .5em 0;
+    margin-bottom: .5em;
+    border-bottom: 1px solid #eee;
+}
+
+div.linkPictureDiv img {
+    display: block;
+    margin: 0 auto;
+    background: #fff;
+    border: 2px solid #F7F7F7;
+}
+
+div#progressbar {
+    height: 16px;
+    background-color: #C7C7CC;
+    border-radius: .6em; /* (height of inner div) / 2 + padding */
+    margin-bottom: 2em;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    padding: 2px;
+}
+
+div#progresscol {
+    background-color: #4CD964;
+    background-image: -moz-linear-gradient(top, #87FC70, #0BD318);
+    background-image: -ms-linear-gradient(top, #87FC70, #0BD318);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#87FC70), to(#0BD318));
+    background-image: -webkit-linear-gradient(top, #87FC70, #0BD318);
+    background-image: -o-linear-gradient(top, #87FC70, #0BD318);
+    background-image: linear-gradient(top, #87FC70, #0BD318);
+    background-repeat: repeat-x;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#' 87 FC70, endColorstr='#' #0BD318, GradientType=0);
+    width: 0%; /* Adjust with JavaScript */
+    height: 100%;
+    margin: auto 0;
+    border-radius: .5em;
+    border: 1px solid #4CD964;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+form#resultForm {
+    margin-top: 1em;
+}
