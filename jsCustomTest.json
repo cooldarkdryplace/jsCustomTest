@@ -109,7 +109,36 @@
                 "comb": "#comb_1_1##comb_2_3##comb_3_1#",
                 "redirect": "http://www.example.com/redirect_1",
                 "text": "First result text here",
-                "HTMLPage": "html_results/result_a1.html",
+                "HTMLPage": "html_results/fresh.html",
+                "twitter": "Your twitter message here",
+                "links": [
+                    {
+                        "linkText": "Link title 1",
+                        "linkAddress": "http://www.example.com/link_1",
+                        "linkPicture": "images/result/1.gif",
+                        "shortDescription": "First link description here"
+                    },
+                    {
+                        "linkText": "Link title 2",
+                        "linkAddress": "http://www.example.com/link_2",
+                        "linkPicture": "images/result/2.gif",
+                        "shortDescription": "Second link description here"
+                    },
+                    {
+                        "linkText": "Link title 3",
+                        "linkAddress": "http://www.example.com/link_3",
+                        "linkPicture": "images/result/3.gif",
+                        "shortDescription": "Third link description here"
+                    }
+                ]
+            },
+            "a2": {
+                "minScore": 6,
+                "maxScore": 50,
+                "comb": "#comb_1_1##comb_2_2##comb_3_3#",
+                "redirect": "http://www.example.com/redirect_1",
+                "text": "Second result text here",
+                "HTMLPage": "html_results/fresh.html",
                 "twitter": "Your twitter message here",
                 "links": [
                     {
