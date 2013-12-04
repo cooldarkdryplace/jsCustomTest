@@ -1,0 +1,189 @@
+JS Custom Test
+
+ABOUT
+
+JS Custom test is a universal quiz script that can be used for many purposes.
+    • Psychological tests
+    • Goods filter
+    • Simple polling script
+
+There are three algorithms that can be used to calculate result.
+    1) Points sum
+    Each answer has points. Sum of all points is used to determine which result to show
+        Example:
+            Question 1: How old are you?
+                Answer 1: 18 (5 points)
+                Answer 2: 21 (10 points)
+                Answer 3: 35 (15 points)
+
+            Result 1 (points 0-5) : You are young and ambitious.
+            Result 2 (points 6-10): You are young but you can buy alcohol.
+            Result 3 (points 11-15): You are young but it;s time to stop drinking, seriously.
+
+    2) Popular variant (Max)
+    Each answer has an identifier. After quiz is passed script calculates what identifier is the most popular and shows a result with same identifier.
+    Question 1: How old are you?
+        Answer 1: 18 (name “a”)
+        Answer 2: 21 (name “b”)
+        Answer 3: 35 (name “c”)
+    Result 1 (name “a”) : You are young and ambitious.
+    Result 2 (name “b”): You are young but you can buy alcohol.
+    Result 3 (name “c”): You are young but it;s time to stop drinking, seriously.
+
+    3) Answers combination
+    Each answer has a unique identifier. After quiz is passed you have a string which matches a result with a same string.
+    Question 1: What is your name?
+        Answer 1: Jack (id “jk”)
+        Answer 2: Max ( id “mx”)
+        Answer 3: John ( id “jn”)
+    Question 1: Where are you from?
+        Answer 1: London ( id “ln”)
+        Answer 2: Sydney ( id “sy”)
+        Answer 3: Paris ( id “ps”)
+    Result 1 ( id “jkln”) : You are Jack from London.
+    Result 2 ( id “mxps”): You are Max from Sydney.
+    Result 3 ( id “jkps”): You are Jack from Paris.
+
+After all questions are answered script can act in different ways.
+    • Generate a page with result text paragraph, and optional links.
+    • Silently send result using AJAX and delete itself.
+    • Redirect to another page.
+
+How to add script to your page
+    1. Copy files
+    2. Edit HTML header
+    3. Insert a DIV to your page
+
+1) Copy file “jsCustomTest.xml” and “css”, “images”, “js” folders to a directory with your HTML file, where you want to show test.
+2) Edit your HTML header. Add this code inside <head></head> tags of your HTML file:
+    <link rel="stylesheet" type="text/css" href="css/reset.css" />
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+    <script type="text/javascript" src="js/jquery-1.8.0.min.js"></script>
+    <script type="text/javascript" src="js/jsCustomTest-min.js"></script>
+3) Insert a blank DIV with id=”jsCustomTest” to your HTML page.
+    Example: <div id=”jsCustomTest”></div>
+
+And a JS Custom Test will draw itself there.
+
+
+HOW TO EDIT DATA
+
+There are two ways to edit your quiz questions, answers and results.
+    • Use XML generator that is included. You will need installed JRE (Java Runtime Environment) to use generator. JRE can be downloaded here:
+  http://www.oracle.com/technetwork/java/javase/downloads/index.html
+    • Manually edit XML in a text editor.
+
+Information for manual XML editing
+    1) All text data saved in one "jsCustomTest .xml" file. Edit jsCustomTest.xml to use your own questions, answers and results.
+    Do not forget that in XML file you can't use special symbols use equivalents:
+        &amp; (&)
+        &lt; (<)
+        &gt; (>)
+        &apos; (')
+        &quot; (")
+
+    Or use numeric character reference, like "&#38;".
+    More information about XML you can find here: http://en.wikipedia.org/wiki/XML
+
+    2) Test script can use any amount of questions with any amount of answers.
+        For example:
+        1. How are you? // Three answers for first question.
+            a) Good
+            b) Bad
+            c) Fine
+        2. What is your name? // But four answers for second question.
+            a) Sam
+            b) Craig
+            c) Max
+            d) Tom
+        3. How old are you? // And just two answers for third question.
+            a) 10-18
+            b) 18-100
+
+    3) You also can insert links to a test result.
+        For example:
+        If you are using this test to help your customers with choosing a perfume you can add links to goods that your customer will enjoy.
+
+    4) You can use your own design using CSS, most of elements have they ID's for your convenience.
+
+    5) Adding and removing questions, answers and results are pretty simple.
+        Here is the example of question with answers:
+            <question name="color">
+                <text>What color do you prefer?</text>
+                <picture>images/questions/qst_2.png</picture>
+                <answers>
+                    <answer name="1" score="5" comb="likes_">Light blue</answer>
+                    <answer name="2" score="10" comb="hates_">Yellow</answer>
+                    <answer name="3" score="15" comb="loves_">Violet</answer>
+                    <answer name="4" score="20" comb="prefers_">Red</answer>
+                </answers>
+            </question>
+
+        Picture link is optional. If you don't use picture for a question don't put any text between <picture></picture> tags.
+        Each answer has three attributes. Depending on selected algorithm script will use one of them.
+        If you are using “popular” algorithm you'll need to “name” attribute. “comb” is used for combination algorithm and score for “points”. Just leave blank attribute you don't need. (name=””).
+
+        Here is the example of result:
+            <result name="1" minscore="0" maxscore="10" comb="comb_example_text">
+                <redirect>http://www.example.com/redirect_1</redirect>
+                <text>Result text here.</text>
+                <twitter>Tweet text here.</twitter>
+                <links>
+                    <link>
+                        <linkText>Link name here</linkText>
+                        <linkAddress>http://www.example.com/something_1.html</linkAddress>
+                        <linkPicture>images/result/1.gif</linkPicture>
+                        <shortDescription>Your text here.</shortDescription>
+                    </link>
+                    <link>
+                        <linkText>Link name here</linkText>
+                        <linkAddress>http://www.example.com/something_2.html</linkAddress>
+                        <linkPicture>images/result/2.gif</linkPicture>
+                        <shortDescription>Your text here.</shortDescription>
+                    </link>
+                </links>
+            </result>
+
+    Name is used for “popular” algorithm. “Minscore” and “maxScore” for “points” algorithm. “Comb” for combination algorithm.
+    You can use as much links as you want.
+
+SETTINGS
+
+There are some simple settings that can be used to customize quiz behavior.
+
+        /**
+         * Common quiz settings
+         */
+        "dataFile": "jsCustomTest.xml",         // data file name must be on the same domain. XML or JSON format.
+        "formListener": "submit.php",           // Script/Servlet name that listens for result data.
+        "targetDiv": "jsCustomTest",            // Div where quiz will be build
+        "showQuestionsOneByOne": {
+            "enabled": true,                        // Show ony current question
+            "mode": "hide"                          // "hide" or "collapse" others
+        },
+        "useDefaultResult": true,               // If no result was found use default. May be especially useful with calculation == "comb".
+        "calculation": "popular",               // "popular", "score", "comb"
+        "resultPage": "default",                // "default", "redirect", "silent", "HTMLPage"
+
+        /**
+         * Settings for result page
+         * generated by script
+         * "resultPage": "default"
+         */
+        "resultLinks": true,                    // Show result links or don't
+        "linksInNewPage": false,                // Open links in new page
+        "resultParagraph": true,                // Show result text or don't
+        "resultBackBtn": true,                  // Show repeat button or don't
+        "formResult": true,                     // Show form on result page or do not
+        "socialCallbacks": {                    // Creating buttons for posting to twitter and Facebook
+            "getTwitterPostButton": true,           // show twitter button
+            "getFBPostButton": true                 // show Facebook button
+        },
+
+        /**
+         * Settings for "resultPage": "silent"
+         */
+        "selfDestruction": {
+            "enabled": true,                        // Delete quiz div from DOM after complete. (Works only if "resultPage" is set to "silent")
+            "destructionTimer": 5000                // Time before self-destruction initiated in ms. 1000ms = 1 second.
+        }
