@@ -136,9 +136,8 @@ p#resultPrgrph {
 }
 
 #linksListDiv ul#linksList li {
-    width: 48%;
-    margin-top: 2em;
-    margin-left: 2%;
+    width: 46%;
+    margin: 2%;
     display: inline-block;
     vertical-align: top;
 }
