@@ -85,217 +85,30 @@
     <results>
         <result name="fresh" minScore="0" maxScore="10" comb="Mary_likes_killing_love_today._Good_luck.">
             <redirect>http://www.example.com/redirect_1</redirect>
-            <text>You are very sweet and romantic person. Floral scents are well suited to you. Choosing a perfume,
-                remember that they must be very soft and unobtrusive. Only you and people close to you should be aware
-                that you use perfume.
-            </text>
             <HTMLPage>html_results/fresh.html</HTMLPage>
-            <twitter>I'm sweet and romantic =) According to test results.</twitter>
-            <links>
-                <link>
-                    <linkText>Good Perfume</linkText>
-                    <linkAddress>http://www.example.com/something_1.html</linkAddress>
-                    <linkPicture>images/result/1.gif</linkPicture>
-                    <shortDescription>Creating perfumes through reverse engineering with analytical techniques such as
-                        GC/MS can reveal the "general" formula for any particular perfume. The difficulty of GC/MS
-                        analysis arises due to the complexity of a perfume's ingredients.
-                    </shortDescription>
-                </link>
-                <link>
-                    <linkText>Another Good Perfume 1</linkText>
-                    <linkAddress>http://www.example.com/something_2.html</linkAddress>
-                    <linkPicture>images/result/2.gif</linkPicture>
-                    <shortDescription>This is particularly due to the presence of natural essential oils and other
-                        ingredients consisting of complex chemical mixtures. However, "anyone armed with good GC/MS
-                        equipment and experienced in using this equipment can today, within days, find out a great deal
-                        about the formulation of any perfume... customers and competitors can analyze most perfumes more
-                        or less precisely."
-                    </shortDescription>
-                </link>
-                <link>
-                    <linkText>Another Good Perfume 2</linkText>
-                    <linkAddress>http://www.example.com/something_3.html</linkAddress>
-                    <linkPicture>images/result/3.gif</linkPicture>
-                    <shortDescription>Antique or badly preserved perfumes undergoing this analysis can also be difficult
-                        due to the numerous degradation by-products and impurities that may have resulted from breakdown
-                        of the odorous compounds.
-                    </shortDescription>
-                </link>
-                <link>
-                    <linkText>Another Good Perfume 3</linkText>
-                    <linkAddress>http://www.example.com/something_4.html</linkAddress>
-                    <linkPicture>images/result/4.gif</linkPicture>
-                    <shortDescription>Ingredients and compounds can usually be ruled out or identified using gas
-                        chromatograph (GC) smellers, which allow individual chemical components to be identified both
-                        through their physical properties and their scent.
-                    </shortDescription>
-                </link>
-            </links>
         </result>
         <result name="2" minScore="11" maxScore="30" comb="">
             <redirect>http://www.example.com/redirect_2</redirect>
-            <text>You do not need too heavy, artificial flavors. You are energetic, cheerful and sporty - your perfume
-                should be fresh and uplifting.
-            </text>
             <HTMLPage>html_results/result_2.html</HTMLPage>
-            <twitter>I do not need too heavy, artificial flavors. According to test results.</twitter>
-            <links>
-                <link>
-                    <linkText>Good Perfume 1</linkText>
-                    <linkAddress>http://www.example.com/something_5.html</linkAddress>
-                    <linkPicture>images/result/5.gif</linkPicture>
-                    <shortDescription>Reverse engineering of best-selling perfumes in the market is a very common
-                        practice in the fragrance industry due to the relative simplicity of operating GC equipment, the
-                        pressure to produce marketable fragrances, and the highly lucrative nature of the perfume
-                        market.
-                    </shortDescription>
-                </link>
-                <link>
-                    <linkText>Another Good Perfume 4</linkText>
-                    <linkAddress>http://www.example.com/something_6.html</linkAddress>
-                    <linkPicture>images/result/6.gif</linkPicture>
-                    <shortDescription>Perfume ingredients, regardless of natural or synthetic origins, may all cause
-                        health or environmental problems when used or abused in substantial quantities. Although the
-                        areas are under active research, much remains to be learned about the effects of fragrance on
-                        human health and the environment.
-                    </shortDescription>
-                </link>
-                <link>
-                    <linkText>Another Good Perfume 5</linkText>
-                    <linkAddress>http://www.example.com/something_7.html</linkAddress>
-                    <linkPicture>images/result/7.gif</linkPicture>
-                    <shortDescription>Synthetic musks are pleasant in smell and relatively inexpensive, as such they are
-                        often employed in large quantities to cover the unpleasant scent of laundry detergents and many
-                        personal cleaning products. Due to their large scale use, several types of synthetic musks have
-                        been found in human fat and milk.
-                    </shortDescription>
-                </link>
-                <link>
-                    <linkText>Another Good Perfume 6</linkText>
-                    <linkAddress>http://www.example.com/something_8.html</linkAddress>
-                    <linkPicture>images/result/8.gif</linkPicture>
-                    <shortDescription>The demands for aromatic materials like sandalwood, agarwood, musk has led to the
-                        endangerment of these species as well as illegal trafficking and harvesting.
-                    </shortDescription>
-                </link>
-            </links>
         </result>
         <result name="3" minScore="31" maxScore="60" comb="">
             <redirect>http://www.example.com/redirect_3</redirect>
-            <text>For you, as for a passionate and fiery woman suit sensual, persistent flavors - a perfect addition to
-                your personality.
-            </text>
             <HTMLPage>html_results/result_3.html</HTMLPage>
-            <twitter>I need persistent flavors. According to test results.</twitter>
-            <links>
-                <link>
-                    <linkText>Good Perfume 2</linkText>
-                    <linkAddress>http://www.example.com/something_9.html</linkAddress>
-                    <linkPicture>images/result/9.gif</linkPicture>
-                    <shortDescription>Due to the need for protection of trade secrets, companies rarely give the full
-                        listing of ingredients regardless of their effects on health. In Europe, as from 11 March 2005,
-                        the mandatory listing of a set of 26 recognized fragrance allergens was enforced.
-                    </shortDescription>
-                </link>
-                <link>
-                    <linkText>Another Good Perfume 7</linkText>
-                    <linkAddress>http://www.example.com/something_10.html</linkAddress>
-                    <linkPicture>images/result/10.gif</linkPicture>
-                    <shortDescription>Proper preservation of perfumes involve keeping them away from sources of heat and
-                        storing them where they will not be exposed to light. An opened bottle will keep its aroma
-                        intact for several years, as long as it is well stored.
-                    </shortDescription>
-                </link>
-                <link>
-                    <linkText>Another Good Perfume 8</linkText>
-                    <linkAddress>http://www.example.com/something_11.html</linkAddress>
-                    <linkPicture>images/result/11.gif</linkPicture>
-                    <shortDescription>Perfumes are best preserved when kept in light-tight aluminium bottles or in their
-                        original packaging when not in use, and refrigerated to relatively low temperatures: between 3-7
-                        degrees Celsius (37-45 degrees Fahrenheit).
-                    </shortDescription>
-                </link>
-                <link>
-                    <linkText>Another Good Perfume 9</linkText>
-                    <linkAddress>http://www.example.com/something_12.html</linkAddress>
-                    <linkPicture>images/result/12.gif</linkPicture>
-                    <shortDescription>Sprays also have the advantage of isolating fragrance inside a bottle and
-                        preventing it from mixing with dust, skin, and detritus, which would degrade and alter the
-                        quality of a perfume.
-                    </shortDescription>
-                </link>
-            </links>
         </result>
         <result name="4" minScore="61" maxScore="120" comb="">
             <redirect>http://www.example.com/redirect_4</redirect>
-            <text>You follow the changes in fashion and always adhere to the latest trends, so you need a bright flavor
-                that will keep your confidence.
-            </text>
             <HTMLPage>html_results/result_4.html</HTMLPage>
-            <twitter>I always follow the changes in fashion. According to test results.</twitter>
-            <links>
-                <link>
-                    <linkText>Good Perfume 3</linkText>
-                    <linkAddress>http://www.example.com/something_13.html</linkAddress>
-                    <linkPicture>images/result/13.gif</linkPicture>
-                    <shortDescription>Aromatherapy may have origins in antiquity with the use of infused aromatic oils,
-                        made by macerating dried plant material in fatty oil, heating and then filtering. Many such oils
-                        are described by Dioscorides, along with beliefs of the time regarding their healing properties,
-                        in his De Materia Medica, written in the first century.
-                    </shortDescription>
-                </link>
-                <link>
-                    <linkText>Another Good Perfume 10</linkText>
-                    <linkAddress>http://www.example.com/something_14.html</linkAddress>
-                    <linkPicture>images/result/14.gif</linkPicture>
-                    <shortDescription>Fragrant oils extracted primarily from flowers or delicate plant tissues through
-                        solvent or supercritical fluid extraction (e.g., rose absolute). The term is also used to
-                        describe oils extracted from fragrant butters, concretes, and enfleurage pommades using ethanol.
-                    </shortDescription>
-                </link>
-                <link>
-                    <linkText>Another Good Perfume 11</linkText>
-                    <linkAddress>http://www.example.com/something_15.html</linkAddress>
-                    <linkPicture>images/result/15.gif</linkPicture>
-                    <shortDescription>Fragrant oils extracted from plants chiefly through steam distillation (e.g.,
-                        eucalyptus oil) or expression (grapefruit oil). However, the term is also occasionally used to
-                        describe fragrant oils extracted from plant material by any solvent extraction.
-                    </shortDescription>
-                </link>
-                <link>
-                    <linkText>Another Good Perfume 12</linkText>
-                    <linkAddress>http://www.example.com/something_16.html</linkAddress>
-                    <linkPicture>images/result/16.gif</linkPicture>
-                    <shortDescription>Raw Herbs: Typically higher oil content plant based materials dried, crushed, and
-                        heated to extract and inhale the aromatic oil vapors in a direct inhalation modality.
-                    </shortDescription>
-                </link>
-            </links>
         </result>
         <result name="default">
             <redirect>http://www.example.com/redirect_5</redirect>
-            <text>This is a default result example.</text>
             <HTMLPage>html_results/default.html</HTMLPage>
-            <twitter>I love this default result =)</twitter>
-            <links>
-                <link>
-                    <linkText>Link for default result</linkText>
-                    <linkAddress>http://www.example.com/something_42.html</linkAddress>
-                    <linkPicture>images/result/13.gif</linkPicture>
-                    <shortDescription>You can use as much links as you want.</shortDescription>
-                </link>
-            </links>
         </result>
     </results>
     <local>
         <name>Find your Perfume</name>
         <header>Questions to go:</header>
         <resultHeader>Result:</resultHeader>
-        <backButtonText>Repeat test</backButtonText>
-        <formSubmit>Email result</formSubmit>
         <silentResult>Thanks!</silentResult>
-        <loadingText>Sending results...</loadingText>
-        <formSubmitText>Email sent!</formSubmitText>
     </local>
 </test>
 
