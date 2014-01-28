@@ -104,14 +104,14 @@
                 "maxScore": 5,
                 "comb": "#comb_1_1##comb_2_3##comb_3_1#",
                 "redirect": "http://www.example.com/redirect_1",
-                "HTMLPage": "html_results/fresh.html"
+                "HTMLPage": "html_results/result_1.html"
             },
             "a2": {
                 "minScore": 6,
                 "maxScore": 50,
                 "comb": "#comb_1_1##comb_2_2##comb_3_3#",
                 "redirect": "http://www.example.com/redirect_1",
-                "HTMLPage": "html_results/fresh.html"
+                "HTMLPage": "html_results/result_2.html"
             },
             "default": {
                 "redirect": "http://www.example.com/redirect_42",

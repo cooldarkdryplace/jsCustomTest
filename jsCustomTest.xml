@@ -85,7 +85,7 @@
     <results>
         <result name="fresh" minScore="0" maxScore="10" comb="Mary_likes_killing_love_today._Good_luck.">
             <redirect>http://www.example.com/redirect_1</redirect>
-            <HTMLPage>html_results/fresh.html</HTMLPage>
+            <HTMLPage>html_results/result_1.html</HTMLPage>
         </result>
         <result name="2" minScore="11" maxScore="30" comb="">
             <redirect>http://www.example.com/redirect_2</redirect>
