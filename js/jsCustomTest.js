@@ -5,12 +5,136 @@
  * Time: 4:22 PM
  */
 
+localDataSourceObject = {
+    "test": {
+        "local": {
+            "name": "Find your Perfume",
+            "header": "Questions to go:",
+            "resultHeader": "Result:",
+            "silentResult": "Thanks!"
+        },
+        "questions": [
+            {
+                "questionText": "Is that first question text?",
+                "pictureSource": "images/questions/qst_1.png",
+                "answers": [
+                    {
+                        "answerText": "That is the first answer for the first question",
+                        "score": 0,
+                        "name": "a1",
+                        "comb": "#comb_1_1#"
+                    },
+                    {
+                        "answerText": "That is the second answer for the first question",
+                        "score": 5,
+                        "name": "a2",
+                        "comb": "#comb_1_2#"
+                    },
+                    {
+                        "answerText": "That is the third answer for the first question",
+                        "score": 10,
+                        "name": "a3",
+                        "comb": "#comb_1_3#"
+                    },
+                    {
+                        "answerText": "That is the fourth answer for the first question",
+                        "score": 15,
+                        "name": "a4",
+                        "comb": "#comb_1_4#"
+                    }
+                ]
+            },
+            {
+                "questionText": "Is that second question text?",
+                "pictureSource": "images/questions/qst_1.png",
+                "answers": [
+                    {
+                        "answerText": "That is the first answer for the second question",
+                        "score": 15,
+                        "name": "a1",
+                        "comb": "#comb_2_1#"
+                    },
+                    {
+                        "answerText": "That is the second answer for the second question",
+                        "score": 5,
+                        "name": "a2",
+                        "comb": "#comb_2_2#"
+                    },
+                    {
+                        "answerText": "That is the third answer for the second question",
+                        "score": 0,
+                        "name": "a3",
+                        "comb": "#comb_2_3#"
+                    },
+                    {
+                        "answerText": "That is the fourth answer for the second question",
+                        "score": 10,
+                        "name": "a4",
+                        "comb": "#comb_2_4#"
+                    }
+                ]
+            },
+            {
+                "questionText": "Is that third question text?",
+                "pictureSource": "images/questions/qst_1.png",
+                "answers": [
+                    {
+                        "answerText": "That is the first answer for the third question",
+                        "score": 0,
+                        "name": "a1",
+                        "comb": "#comb_3_1#"
+                    },
+                    {
+                        "answerText": "That is the second answer for the third question",
+                        "score": 5,
+                        "name": "a2",
+                        "comb": "#comb_3_2#"
+                    },
+                    {
+                        "answerText": "That is the third answer for the third question",
+                        "score": 10,
+                        "name": "a3",
+                        "comb": "#comb_3_3#"
+                    },
+                    {
+                        "answerText": "That is the fourth answer for the third question",
+                        "score": 15,
+                        "name": "a4",
+                        "comb": "#comb_3_4#"
+                    }
+                ]
+            }
+        ],
+        "results": {
+            "a1": {
+                "minScore": 0,
+                "maxScore": 5,
+                "comb": "#comb_1_1##comb_2_3##comb_3_1#",
+                "redirect": "http://www.example.com/redirect_1",
+                "HTMLPage": "html_results/result_1.html"
+            },
+            "a2": {
+                "minScore": 6,
+                "maxScore": 50,
+                "comb": "#comb_1_1##comb_2_2##comb_3_3#",
+                "redirect": "http://www.example.com/redirect_1",
+                "HTMLPage": "html_results/result_2.html"
+            },
+            "default": {
+                "redirect": "http://www.example.com/redirect_42",
+                "HTMLPage": "html_results/default.html"
+            }
+        }
+    }
+};
+
+
 var userTest = {
     "settings": {
         /**
          * Common quiz settings
          */
-        "dataFile": "jsCustomTest.xml",         // data file name must be on the same domain. XML or JSON format.
+        "dataSource": "jsCustomTest.xml",       // data file name must be on the same domain. XML or JSON format. special case: "data.local"
         "formListener": "submit.php",           // Script/Servlet name that listens for result data.
         "targetDiv": "jsCustomTest",            // Div where quiz will be build
         "showQuestionsOneByOne": {
@@ -48,14 +172,18 @@ var userTest = {
         }
 
         // Substring filename to get its extension
-        var dataFileFormat = userTest.settings.dataFile.toLowerCase()
-            .substring(userTest.settings.dataFile.lastIndexOf(".") + 1);
+        var dataFileFormat = userTest.settings.dataSource.toLowerCase()
+            .substring(userTest.settings.dataSource.lastIndexOf(".") + 1);
 
-        // Making POST request to get quiz data
-        $.post(userTest.settings.dataFile, function (data) {
-            parse(data, dataFileFormat)
-        }, dataFileFormat);
-
+        // If source is set to local data then we do not try to get test data from server
+        if (userTest.settings.dataSource === "data.local") {
+            parse(localDataSourceObject, dataFileFormat);
+        } else {
+            // Making GET request to get quiz data
+            $.get(userTest.settings.dataSource, function (data) {
+                parse(data, dataFileFormat)
+            }, dataFileFormat);
+        }
 
         /**
          * Function that fills in global object userTest with data.
@@ -265,10 +393,18 @@ var userTest = {
                     parseJSON(doc);
                 }
                     break;
+
+                // local data also saved as JavaScript object
+                case "local":
+                {
+                    parseJSON(doc);
+                }
+                    break;
                 default:
                 {
                     throw "Exception: Data file type unknown: '" + dataFileFormat
-                        + "' currently only XML and JSON are supported.";
+                        + "' currently only XML and JSON are supported. " +
+                        "In case of using local data source make sure name ends with '.local'";
                 }
             }
 
@@ -299,7 +435,7 @@ var userTest = {
                 continue;
             }
 
-            qstNumber += 1; // Counting amount of questions.
+            qstNumber += 1; // Counting number of questions.
             var qstDiv = $(document.createElement("div")).attr('id', question);
 
             // Adding className to current qstDiv
@@ -592,6 +728,9 @@ var userTest = {
         // Saving result in object for future generations and giant space ants.
         userTest.resultVariant = variant;
 
+        // Checking if variant was found. If not - apply default or throw error.
+        userTest.doResultCheck();
+
         var resultNode;
 
         // Depending on settings redirect, silently submit result or show result page.
@@ -599,16 +738,14 @@ var userTest = {
 
             case "HTMLPage":
             {
-                // Checking if variant was found. If not - apply default or throw error.
-                userTest.doResultCheck();
 
                 if (!userTest.resultVariantObject.HTMLPage) {
-                    throw "Exception: HTMLPage is current result rendering setting, " +
-                        "but no source set in data file '" + userTest.settings.dataFile + "'";
+                    throw "Exception: [HTMLPage] is current result rendering setting, " +
+                        "but no source set in data file '" + userTest.settings.dataSource + "'";
                 }
 
-                // Making POST request to get quiz data
-                $.post(userTest.resultVariantObject.HTMLPage, function (data) {
+                // Making GET request to get quiz data
+                $.get(userTest.resultVariantObject.HTMLPage, function (data) {
                     resultNode = $(data).filter("#resultNode").html();
 
                     // Remove result header, questions node, append result node
@@ -642,6 +779,11 @@ var userTest = {
                 $.post(userTest.settings.formListener, {
                     result: userTest.resultVariant
                 });
+
+                if (!userTest.resultVariantObject.redirect) {
+                    throw "Exception: [redirect] is current result rendering setting, " +
+                        "but no source set in data file '" + userTest.settings.dataSource + "'";
+                }
 
                 // Note that redirect may be blocked by browser or browser plugins like AdBlock
                 window.location = userTest.resultVariantObject.redirect;
@@ -732,6 +874,7 @@ var userTest = {
         if (!userTest.resultVariantObject) {
 
             if (userTest.settings.useDefaultResult) {
+                userTest.resultVariant = "default";
                 userTest.resultVariantObject = userTest.localAnsw["default"];
 
             } else {

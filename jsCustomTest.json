@@ -15,7 +15,71 @@
                         "answerText": "That is the first answer for the first question",
                         "score": 0,
                         "name": "a1",
-                        "comb": "#comb_1_1#"
+                        "comb": "#comb_1_1#",
+                        "questions": [
+                            {
+                                "questionText": "Is that first condition question text?",
+                                "pictureSource": "images/questions/qst_1.png",
+                                "answers": [
+                                    {
+                                        "answerText": "That is the first answer for the first conditional question",
+                                        "score": 5,
+                                        "name": "a1",
+                                        "comb": "#comb_2_1_1#"
+                                    },
+                                    {
+                                        "answerText": "That is the second answer for the first conditional question",
+                                        "score": 10,
+                                        "name": "a2",
+                                        "comb": "#comb_2_1_2#"
+                                    },
+                                    {
+                                        "answerText": "That is the third answer for the first conditional question",
+                                        "score": 15,
+                                        "name": "a3",
+                                        "comb": "#comb_2_1_3#",
+                                        "questions": [
+                                            {
+                                                "questionText": "Third level conditional question text.",
+                                                "pictureSource": "images/questions/qst_1.png",
+                                                "answers": [
+                                                    {
+                                                        "answerText": "That is the first answer for the third level conditional question",
+                                                        "score": 15,
+                                                        "name": "a1",
+                                                        "comb": "#comb_2_1_3_1#"
+                                                    },
+                                                    {
+                                                        "answerText": "That is the second answer for the third level conditional question",
+                                                        "score": 0,
+                                                        "name": "a2",
+                                                        "comb": "#comb_2_1_3_2#"
+                                                    },
+                                                    {
+                                                        "answerText": "That is the third answer for the third level conditional question",
+                                                        "score": 10,
+                                                        "name": "a3",
+                                                        "comb": "#comb_2_1_3_3#"
+                                                    },
+                                                    {
+                                                        "answerText": "That is the fourth answer for the third level conditional question",
+                                                        "score": 5,
+                                                        "name": "a4",
+                                                        "comb": "#comb_2_1_3_4#"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "answerText": "That is the fourth answer for the first conditional question",
+                                        "score": 0,
+                                        "name": "a4",
+                                        "comb": "#comb_2_1_4#"
+                                    }
+                                ]
+                            }
+                        ]
                     },
                     {
                         "answerText": "That is the second answer for the first question",
