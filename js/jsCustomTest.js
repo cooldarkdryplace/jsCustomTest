@@ -5,130 +5,6 @@
  * Time: 4:22 PM
  */
 
-localDataSourceObject = {
-    "test": {
-        "local": {
-            "name": "Find your Perfume",
-            "header": "Questions to go:",
-            "resultHeader": "Result:",
-            "silentResult": "Thanks!"
-        },
-        "questions": [
-            {
-                "questionText": "Is that first question text?",
-                "pictureSource": "images/questions/qst_1.png",
-                "answers": [
-                    {
-                        "answerText": "That is the first answer for the first question",
-                        "score": 0,
-                        "name": "a1",
-                        "comb": "#comb_1_1#"
-                    },
-                    {
-                        "answerText": "That is the second answer for the first question",
-                        "score": 5,
-                        "name": "a2",
-                        "comb": "#comb_1_2#"
-                    },
-                    {
-                        "answerText": "That is the third answer for the first question",
-                        "score": 10,
-                        "name": "a3",
-                        "comb": "#comb_1_3#"
-                    },
-                    {
-                        "answerText": "That is the fourth answer for the first question",
-                        "score": 15,
-                        "name": "a4",
-                        "comb": "#comb_1_4#"
-                    }
-                ]
-            },
-            {
-                "questionText": "Is that second question text?",
-                "pictureSource": "images/questions/qst_1.png",
-                "answers": [
-                    {
-                        "answerText": "That is the first answer for the second question",
-                        "score": 15,
-                        "name": "a1",
-                        "comb": "#comb_2_1#"
-                    },
-                    {
-                        "answerText": "That is the second answer for the second question",
-                        "score": 5,
-                        "name": "a2",
-                        "comb": "#comb_2_2#"
-                    },
-                    {
-                        "answerText": "That is the third answer for the second question",
-                        "score": 0,
-                        "name": "a3",
-                        "comb": "#comb_2_3#"
-                    },
-                    {
-                        "answerText": "That is the fourth answer for the second question",
-                        "score": 10,
-                        "name": "a4",
-                        "comb": "#comb_2_4#"
-                    }
-                ]
-            },
-            {
-                "questionText": "Is that third question text?",
-                "pictureSource": "images/questions/qst_1.png",
-                "answers": [
-                    {
-                        "answerText": "That is the first answer for the third question",
-                        "score": 0,
-                        "name": "a1",
-                        "comb": "#comb_3_1#"
-                    },
-                    {
-                        "answerText": "That is the second answer for the third question",
-                        "score": 5,
-                        "name": "a2",
-                        "comb": "#comb_3_2#"
-                    },
-                    {
-                        "answerText": "That is the third answer for the third question",
-                        "score": 10,
-                        "name": "a3",
-                        "comb": "#comb_3_3#"
-                    },
-                    {
-                        "answerText": "That is the fourth answer for the third question",
-                        "score": 15,
-                        "name": "a4",
-                        "comb": "#comb_3_4#"
-                    }
-                ]
-            }
-        ],
-        "results": {
-            "a1": {
-                "minScore": 0,
-                "maxScore": 5,
-                "comb": "#comb_1_1##comb_2_3##comb_3_1#",
-                "redirect": "http://www.example.com/redirect_1",
-                "HTMLPage": "html_results/result_1.html"
-            },
-            "a2": {
-                "minScore": 6,
-                "maxScore": 50,
-                "comb": "#comb_1_1##comb_2_2##comb_3_3#",
-                "redirect": "http://www.example.com/redirect_1",
-                "HTMLPage": "html_results/result_2.html"
-            },
-            "default": {
-                "redirect": "http://www.example.com/redirect_42",
-                "HTMLPage": "html_results/default.html"
-            }
-        }
-    }
-};
-
-
 var userTest = {
     "settings": {
         /**
@@ -143,7 +19,7 @@ var userTest = {
         },
         "useDefaultResult": true,               // If no result was found use default. May be especially useful with calculation == "comb".
         "calculation": "popular",               // "popular", "score", "comb"
-        "resultPage": "HTMLPage",               // "redirect", "silent", "HTMLPage"
+        "resultPage": "redirect",               // "redirect", "silent", "HTMLPage"
 
         /**
          * Settings for "resultPage": "silent"
@@ -156,7 +32,7 @@ var userTest = {
 
     /**
      * Method is used for:
-     * 1) loading file with quiz data from server using AJAX.
+     * 1) Loading file with quiz data from server using AJAX.
      * 2) Parsing data file.
      * 3) Filling global object userTest with extracted data.
      */
