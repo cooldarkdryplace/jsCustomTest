@@ -5,30 +5,302 @@
  * Time: 4:22 PM
  */
 
+var quizConstants = {
+    result: {
+        REDIRECT: "redirect",
+        SILENT: "silent",
+        HTML_PAGE: "HTMLPage"
+    },
+
+    calculation: {
+        POPULAR: "popular",
+        SCORE: "score",
+        COMB: "comb"
+    },
+
+    questionAnimation: {
+        HIDE: "hide",
+        COLLAPSE: "collapse"
+    }
+};
+
 var userTest = {
-    "settings": {
+
+    settings: {
         /**
          * Common quiz settings
          */
-        "dataSource": "jsCustomTest.xml",       // data file name must be on the same domain. XML or JSON format. special case: "data.local"
-        "formListener": "submit.php",           // Script/Servlet name that listens for result data.
-        "targetDiv": "jsCustomTest",            // Div where quiz will be build
+        "dataSource": "jsCustomTest.json",              // URL that points to JSON source (in this case it is a file)
+        "formListener": "submit.php",                   // Relative path to server page that listens for result data.
+        "targetDiv": "jsCustomTest",                    // Div where quiz will be build
         "showQuestionsOneByOne": {
-            "enabled": true,                        // Show ony current question
-            "mode": "hide"                          // "hide" or "collapse" others
+            "enabled": true,                            // Show ony current question
+            "mode": quizConstants.questionAnimation.HIDE     // "HIDE" or "COLLAPSE" not active question
         },
-        "useDefaultResult": true,               // If no result was found use default. May be especially useful with calculation == "comb".
-        "calculation": "popular",               // "popular", "score", "comb"
-        "resultPage": "redirect",               // "redirect", "silent", "HTMLPage"
+        "useDefaultResult": true,                       // If no result was found use default. May be especially useful with calculation "COMB".
+        "calculation": quizConstants.calculation.POPULAR,    // "POPULAR", "SCORE", "COMB"
+        "resultPage": quizConstants.result.HTML_PAGE,        // "REDIRECT", "SILENT", "HTML_PAGE"
 
         /**
-         * Settings for "resultPage": "silent"
+         * Settings ONLY for "resultPage":
+         * "userTest.result.SILENT"
          */
         "selfDestruction": {
-            "enabled": true,                        // Delete quiz div from DOM after complete. (Works only if "resultPage" is set to "silent")
-            "destructionTimer": 5000                // Time before self-destruction initiated in ms. 1000ms = 1 second.
+            "enabled": true,                            // Delete quiz div from DOM after complete. (Works only if "resultPage" is set to "silent")
+            "destructionTimer": 5000                    // Time before self-destruction initiated in ms. 1000ms = 1 second.
         }
     },
+
+    // UTILITY FUNCTIONS
+    isAllAnswered: function () {
+        var calc = userTest.settings.calculation;
+
+        // Counting number of answered questions
+        userTest.qstDone = 0;
+        for (var m in userTest[calc]) {
+            if (userTest[calc].hasOwnProperty(m)) {
+                userTest.qstDone += 1;
+            }
+        }
+
+        return userTest.qstTotalNumber == userTest.qstDone;
+    },
+
+    updateView: {
+        headerNode: function () {
+            var testHeader = $("#testHeaderH2"),
+                headerMsg;
+
+            if (userTest.isAllAnswered()) {
+                headerMsg = userTest.local["resultHeader"];
+            } else {
+                headerMsg = userTest.local.header + " " + (userTest.qstTotalNumber - userTest.qstDone);
+            }
+
+            testHeader.text(headerMsg);
+
+            if (testHeader.length == 0) {
+                testHeader.append($(document.createElement("h2")).text(headerMsg));
+            } else {
+                testHeader.fadeOut('fast', function () {
+                    $(this).text(headerMsg).fadeIn('fast');
+                    userTest.updateView.progressBarNode();
+                });
+            }
+        },
+
+        progressBarNode: function () {
+            var progressbar = $("#progressbar"),
+                progressColumn = $("#progresscol");
+
+            // If progressbar is not shown then we will show it.
+            if (progressColumn.length == 0) {
+                progressbar.append($(document.createElement("div")).attr('id', 'progresscol').animate({
+                    width: (100 - (userTest.qstTotalNumber - userTest.qstDone) / (userTest.qstTotalNumber / 100)) + "%"
+                }));
+            }
+            // Updating progress bar animation here
+            progressColumn.animate({
+                width: (100 - (userTest.qstTotalNumber - userTest.qstDone) / (userTest.qstTotalNumber / 100)) + "%"
+            });
+
+            if (userTest.isAllAnswered()) {
+                progressbar.hide();
+            }
+        },
+
+        questionNode: function (event) {
+            // If input clicked - Marking target H3 with className "answered"
+            // Searching for header tag.
+            $(event.target).closest('.question').find('h3:first').addClass('answered');
+
+            // Slide next question if we are hiding them. (showQuestionsOneByOne.enabled == true)
+            if (userTest.settings.showQuestionsOneByOne.enabled) {
+                // Find next question content and show it
+                switch (userTest.settings.showQuestionsOneByOne.mode) {
+                    case quizConstants.questionAnimation.COLLAPSE:
+                    {
+                        $("#" + $(event.target).closest('.question')[0].id)
+                            .next().find('.question_wrapper').slideDown();
+                    }
+                        break;
+                    case quizConstants.questionAnimation.HIDE:
+                    {
+                        $("#" + $(event.target).closest('.question')[0].id)
+                            .next('.question').slideDown();
+                    }
+                        break;
+                    default:
+                    {
+                        throw "Show questions 'one by one' is enabled but wrong mode is set: "
+                            + userTest.settings.showQuestionsOneByOne.mode;
+                    }
+                }
+            }
+
+            userTest.updateView.headerNode();
+        }
+    },
+
+    calculateResult: {
+        popular: function () {
+            var result = {},
+                popular = userTest[quizConstants.calculation.POPULAR],
+                variant;
+
+            for (variant in popular) {
+                if (popular.hasOwnProperty(variant)) {
+                    result[popular[variant]] ?
+                        result[popular[variant]] += 1
+                        : result[popular[variant]] = 1;
+                }
+            }
+
+            var max = 0;
+
+            for (var v in result) {
+                if (result.hasOwnProperty(v)) {
+                    if (result[v] > max) {
+                        max = result[v];
+                        variant = v;
+                    }
+                }
+            }
+
+            // Result to show
+            userTest.resultVariantObject = userTest.localAnsw[variant];
+
+            return variant;
+        },
+
+        score: function () {
+            var result = 0,
+                score = userTest[quizConstants.calculation.SCORE];
+
+            for (var answer in score) {
+                if (score.hasOwnProperty(answer)) {
+                    result += parseInt(score[answer]);
+                }
+            }
+
+            for (var variant in userTest.localAnsw) {
+                if (userTest.localAnsw.hasOwnProperty(variant)) {
+                    if (result >= userTest.localAnsw[variant]["minScore"]
+                        && result <= userTest.localAnsw[variant]["maxScore"]) {
+                        // Result to show
+                        userTest.resultVariantObject = userTest.localAnsw[variant];
+
+                        return variant;
+                    }
+                }
+            }
+        },
+
+        comb: function () {
+            var result = "",
+                comb = userTest[quizConstants.calculation.COMB],
+                variant;
+
+            for (var answer in comb) {
+                if (comb.hasOwnProperty(answer)) {
+                    result += comb[answer];
+                }
+            }
+
+            for (variant in userTest.localAnsw) {
+                if (userTest.localAnsw.hasOwnProperty(variant)) {
+                    if (result == userTest.localAnsw[variant].comb) {
+                        // Result to show
+                        userTest.resultVariantObject = userTest.localAnsw[variant];
+                    }
+                }
+            }
+
+            return variant;
+        }
+    },
+
+    renderResult: {
+        HTMLPage: function () {
+
+            if (!userTest.resultVariantObject.HTMLPage) {
+                throw "Exception: [HTMLPage] is current result rendering setting, " +
+                    "but no source set in data file '" + userTest.settings.dataSource + "'";
+            }
+
+            // Making GET request to get quiz data
+            $.get(userTest.resultVariantObject.HTMLPage, function (data) {
+                var resultNode = $(data).filter("#resultNode").html();
+
+                // Remove result header, questions node, append result node
+                userTest.targetDiv.fadeOut('fast', function () {
+                    $(this).find('#testHeaderH2').remove();
+                    $(this).find('#testBodyDiv').remove();
+
+                    if (resultNode == undefined) {
+                        throw "Exception: HTML result page '" + userTest.resultVariantObject.HTMLPage
+                            + "' is not accessible or doesn't have DIV with id='resultNode'";
+                    }
+
+                    // Inserting parsed HTML from result HTMLPage source
+                    $(this).append(resultNode);
+                    $(this).fadeIn('fast');
+                });
+
+            });
+
+            //Submitting data for stat
+            $.post(userTest.settings.formListener, {
+                result: userTest.resultVariant
+            });
+        },
+
+        redirect: function () {
+            if (!userTest.resultVariantObject.redirect) {
+                throw "Exception: [redirect] is current result rendering setting, " +
+                    "but no source set in data file '" + userTest.settings.dataSource + "'";
+            }
+
+            // Note that redirect may be blocked by browser or browser plugins like AdBlock
+            window.location = userTest.resultVariantObject["redirect"];
+        },
+
+        silent: function () {
+            // Answer text after submitting data
+            var resultNode = $(document.createElement("div")).attr('id', 'testResultDiv')
+                .append($(document.createElement("p")).attr('id', 'testResultP').text(userTest.local["loadingText"]));
+
+            userTest.targetDiv.find('#testHeaderH2').remove();
+            userTest.targetDiv.find('#testBodyDiv').remove(); // Removing DIV with questions and answers
+
+            userTest.targetDiv.append(resultNode);
+
+            // AJAX result submit
+            var params, thanks;
+
+            params = {
+                result: userTest.resultVariant
+            };
+
+            thanks = function () {
+                $("#testResultP").text(userTest.local["silentResult"]);
+            };
+
+            $.post(userTest.settings.formListener, params, thanks);
+
+            // Delete test DIV after silent form submit.
+            if (userTest.settings.selfDestruction.enabled) {
+                function destruction() {
+                    userTest.targetDiv.remove();
+                }
+
+                // Sending DIV to the Walhalla in 3, 2, 1...
+                setTimeout(destruction, userTest.settings.selfDestruction.destructionTimer);
+            }
+        }
+    },
+
+    // MAIN LOGIC
 
     /**
      * Method is used for:
@@ -47,244 +319,32 @@ var userTest = {
                 "Current setting is: 'targetDiv': '" + userTest.settings.targetDiv + "'.";
         }
 
-        // Substring filename to get its extension
-        var dataFileFormat = userTest.settings.dataSource.toLowerCase()
-            .substring(userTest.settings.dataSource.lastIndexOf(".") + 1);
+        // Making GET request to get quiz data
+        $.get(userTest.settings.dataSource, function (data) {
+            parse(data)
+        }, "json");
 
-        // If source is set to local data then we do not try to get test data from server
-        if (userTest.settings.dataSource === "data.local") {
-            parse(localDataSourceObject, dataFileFormat);
-        } else {
-            // Making GET request to get quiz data
-            $.get(userTest.settings.dataSource, function (data) {
-                parse(data, dataFileFormat)
-            }, dataFileFormat);
-        }
 
         /**
          * Function that fills in global object userTest with data.
          * @param doc - requested and hopefully downloaded quiz data
-         * @param dataFileFormat - parsed file format. JSON or XML.
          */
-        function parse(doc, dataFileFormat) {
+        function parse(doc) {
 
-            function parseXML(doc) {
-                /**
-                 * Utility function to fill in global object userTest.local{} with localization data
-                 * @param tags - List of key:value elements. Texts that will be displayed in UI.
-                 */
-                function fillLocalData(tags) {
-                    for (var i = 0; i < tags.length; i += 1) {
-                        try {
-                            userTest.local[tags[i]] = doc.getElementsByTagName(tags[i])[0].firstChild.data;
-                        } catch (e) {
-                            console.log("Error accessing data file element with tag:" + tags[i]);
-                        }
-                    }
-                }
+            userTest.local = doc["test"].local;
+            userTest.localQst = doc["test"]["questions"];
+            userTest.localAnsw = doc["test"]["results"];
 
-                /**
-                 *  Tag names used to access localisation data in XML document
-                 */
-                var locals = [
-                    "name",             // test name that is used in test header
-                    "header",           // phrase "Questions to go".
-                    "resultHeader",     // word "Result".
-                    "silentResult"      // text for Silent submit answer
-                ];
+            // Calculate number of questions
+            userTest.qstTotalNumber = 0;
 
-                // Executing utility function to populate localisation data
-                fillLocalData(locals);
-
-                // Getting list of question nodes from XML DOM
-                var questions = doc.getElementsByTagName("question");
-                userTest.qstAmount = questions.length; // Saving amount of questions to add classNames in future.
-
-                // Saving test questions and question answers in userTest global object
-                for (var q = 0, qL = questions.length; q < qL; q += 1) {
-                    var nameQst = questions[q].getAttribute("name"),
-                        newQuestion = {};
-                    newQuestion.name = nameQst;
-
-                    for (var t = questions[q].firstChild; t != null; t = t.nextSibling) {
-                        // Looking for question text
-                        if (t.tagName == "text") { // Saving question text
-                            newQuestion.questionText = t.firstChild.data;
-                        }
-
-                        // Looking for question picture path
-                        if (t.tagName == "picture") { // Saving link to question picture
-                            if (t.firstChild != null) {
-                                newQuestion.pictureSource = t.firstChild.data;
-                            }
-                        }
-                    }
-
-                    // Start populating answers data
-                    newQuestion.answers = [];
-                    for (var n = questions[q].firstChild; n != null; n = n.nextSibling) {
-                        if (n.tagName == "answers") {
-                            for (var i = n.firstChild; i != null; i = i.nextSibling) {
-                                if (i.tagName == "answer") {
-
-                                    /**
-                                     * Dealing with answers attributes
-                                     * Depending on settings parameter "calculation" collecting data.
-                                     * Example: if calculation == score than deal just with score attribute. Ignoring "name" and "comb".
-                                     */
-
-                                    var answerValue,
-                                        newAnswer,
-                                        currentAnswerName = null;
-
-                                    if (i.getAttribute("name")) {
-                                        currentAnswerName = i.getAttribute("name");
-                                        newAnswer = {};
-                                        newAnswer.name = currentAnswerName;
-                                    } else {
-                                        throw "Exception: Name attribute is not provided for an answer."
-                                    }
-
-
-                                    switch (userTest.settings.calculation) {
-                                        case "popular":
-                                        {
-                                            // pass
-                                        }
-                                            break;
-
-                                        case "score":
-                                        {
-                                            if (i.getAttribute("score")) {
-                                                answerValue = i.getAttribute("score");
-                                                newAnswer.score = answerValue;
-                                            } else {
-                                                throw "Exception: Score attribute is not provided for an answer."
-                                            }
-
-                                        }
-                                            break;
-
-                                        case "comb":
-                                        {
-                                            if (i.getAttribute("comb")) {
-                                                answerValue = i.getAttribute("comb");
-                                                newAnswer.comb = answerValue;
-                                            } else {
-                                                throw "Exception: Comb attribute is not provided for an answer."
-                                            }
-
-                                        }
-                                            break;
-
-                                        default:
-                                            throw "Exception: userTest.settings.calculation method is unsupported"
-                                    }
-
-                                    if (i.firstChild.data) {
-                                        newAnswer.answerText = i.firstChild.data;
-                                    } else {
-                                        throw "Exception: Label for answer " + currentAnswerName + " in question" + nameQst + " is empty";
-                                    }
-
-                                    newQuestion.answers.push(newAnswer);
-                                }
-                            }
-                        }
-                    }
-
-                    userTest.localQst.push(newQuestion);
-                }
-
-                // Saving test result variants in object
-                var results = doc.getElementsByTagName("result");
-
-                if (!results) {
-                    throw "Exception: Was not able to find results in data file.";
-                }
-
-                for (var r = 0, rL = results.length; r < rL; r += 1) {
-                    var resultName = results[r].getAttribute("name");
-
-                    if (!results[r].getAttribute("name")) {
-                        throw "Exception: Required name attribute is missing for at least one of results in data file";
-                    }
-
-                    userTest.localAnsw[resultName] = {
-                        "minScore": results[r].getAttribute("minScore"),
-                        "maxScore": results[r].getAttribute("maxScore"),
-                        "comb": results[r].getAttribute("comb"),
-                        "links": []
-                    };
-
-                    for (var s = results[r].firstChild; s != null; s = s.nextSibling) {
-                        switch (s.tagName) {
-                            case "HTMLPage":
-                            {
-                                if (s.firstChild != null) {
-                                    userTest.localAnsw[resultName].HTMLPage = s.firstChild.data;
-                                }
-                            }
-                                break;
-
-                            case "redirect":
-                            {
-                                if (s.firstChild != null) {
-                                    userTest.localAnsw[resultName].redirect = s.firstChild.data;
-                                }
-                            }
-                                break;
-
-                            default: {
-                                // pass
-                            }
-                        }
-                    }
+            for (var i in userTest.localQst) {
+                if (userTest.localQst.hasOwnProperty(i)) {
+                    userTest.qstTotalNumber += 1;
                 }
             }
 
-            function parseJSON(doc) {
-                userTest.local = doc["test"].local;
-                userTest.localQst = doc["test"]["questions"];
-                userTest.localAnsw = doc["test"]["results"];
-
-                // Calculate number of questions
-                userTest.qstAmount = 0;
-
-                for (var i in userTest.localQst) {
-                    if (userTest.localQst.hasOwnProperty(i)) {
-                        userTest.qstAmount += 1;
-                    }
-                }
-            }
-
-            switch (dataFileFormat) {
-                case "xml":
-                {
-                    parseXML(doc);
-                }
-                    break;
-                case "json":
-                {
-                    parseJSON(doc);
-                }
-                    break;
-
-                // local data also saved as JavaScript object
-                case "local":
-                {
-                    parseJSON(doc);
-                }
-                    break;
-                default:
-                {
-                    throw "Exception: Data file type unknown: '" + dataFileFormat
-                        + "' currently only XML and JSON are supported. " +
-                        "In case of using local data source make sure name ends with '.local'";
-                }
-            }
-
-            // Check default result presence
+            // Check default result presence if we need it
             if (userTest.settings.useDefaultResult && !userTest.localAnsw["default"]) {
                 throw "Exception: 'useDefaultResult' is set to true but default result is not present in data file."
             }
@@ -292,11 +352,13 @@ var userTest = {
             // Render quiz HTML page
             userTest.place();
         }
-
     },
 
     /**
-     * Generates all HTML nodes, populates document fragment, appends fragment, registers events.
+     * Generates all HTML nodes
+     * Populates document fragment
+     * Appends fragment
+     * Registers events
      */
     place: function () { // Generating HTML with questions and answers
         var testBodyDiv = $(document.createElement("div")).attr('id', 'testBodyDiv'),
@@ -320,7 +382,7 @@ var userTest = {
 
             if (qstNumber == 1) {
                 classArray.push("questionFirst");
-            } else if (qstNumber == userTest.qstAmount) {
+            } else if (qstNumber == userTest.qstTotalNumber) {
                 classArray.push("questionLast");
             }
 
@@ -329,19 +391,19 @@ var userTest = {
             // Generate question number and question text nodes
             var qstNumSpan = $(document.createElement("span")).append(qstNumber + '.');
             qstDiv.append($(document.createElement("h3")).text(userTest.localQst[question].questionText)
-                .prepend(qstNumSpan).on("click", userTest.toggleVis));
+                .prepend(qstNumSpan).on("click", userTest.toggleVisibility));
 
             var qstWrapper = $(document.createElement('div')).addClass('question_wrapper');
 
             if (userTest.settings.showQuestionsOneByOne.enabled && qstNumber != 1) {
 
                 switch (userTest.settings.showQuestionsOneByOne.mode) {
-                    case "collapse":
+                    case quizConstants.questionAnimation.COLLAPSE:
                     {
                         qstWrapper.css("display", "none");
                     }
                         break;
-                    case "hide":
+                    case quizConstants.questionAnimation.HIDE:
                     {
                         qstDiv.css("display", "none");
                     }
@@ -377,19 +439,19 @@ var userTest = {
                         answerValue;
 
                     switch (userTest.settings.calculation) {
-                        case "popular":
+                        case quizConstants.calculation.POPULAR:
                         {
                             answerValue = userTest.localQst[question].answers[answer].name;
                         }
                             break;
 
-                        case "score":
+                        case quizConstants.calculation.SCORE:
                         {
                             answerValue = userTest.localQst[question].answers[answer].score;
                         }
                             break;
 
-                        case "comb":
+                        case quizConstants.calculation.COMB:
                         {
                             answerValue = userTest.localQst[question].answers[answer].comb;
                         }
@@ -411,7 +473,7 @@ var userTest = {
                     }
 
                     // Registering event handler
-                    $(inputNode).on("click", userTest.analyze).on("click", userTest.toggleVis);
+                    $(inputNode).on("click", userTest.analyze).on("click", userTest.toggleVisibility);
 
                     labelNode.text(questionAnswer).attr('for', answerID);
 
@@ -431,281 +493,100 @@ var userTest = {
     },
     /**
      * Method is used to calculate result depending on algorithm
+     * Event handler. Calculates answered questions.
+     * If all questions answered initiates userTest.result().
      * @param event - JS event object
      */
-    analyze: function (event) { // Event handler. Calculates answered questions. If finished initiates result()
-        var calc = userTest.settings.calculation,
-            progressbar = $("#progressbar"),
-            testHeader = $("#testHeaderH2"),
-            headerMsg;
-
-        if ($("#progresscol").length == 0) {
-            progressbar.append($(document.createElement("div")).attr('id', 'progresscol'));
-        }
-
-        // If input clicked - Marking target H3 with className "answered"
-        // Searching for header tag.
-
-        $(event.target).closest('.question').find('h3:first').addClass('answered');
-
-        // Slide next question if we are hiding them. (showQuestionsOneByOne.enabled == true)
-        if (userTest.settings.showQuestionsOneByOne.enabled) {
-            // Find next question content and show it
-            switch (userTest.settings.showQuestionsOneByOne.mode) {
-                case "collapse":
-                {
-                    $("#" + $(event.target).closest('.question')[0].id).next().find('.question_wrapper').slideDown();
-                }
-                    break;
-                case "hide":
-                {
-                    $("#" + $(event.target).closest('.question')[0].id).next('.question').slideDown();
-                }
-                    break;
-                default:
-                {
-                    //pass
-                }
-            }
-        }
+    analyze: function (event) {
+        userTest.updateView.questionNode(event);
 
         /**
-         * Saving current answer in global object
-         * Depending on settings (userTest.settings.calculation) changes value of max, score or comb will be used.
-         * Init if never used before.
+         * Creating a global object that will keep all answers values.
+         * Depending on calculation settings we will look for "name", "score" or "comb" attributes.
          */
+        var calc = userTest.settings.calculation;
+
         if (!userTest[calc]) {
+            //Init if never used before.
             userTest[calc] = {};
         }
 
         userTest[calc][this.name] = this.value;
 
-        // Changing answered questions counter
-        userTest.qstDone = 0;
-        for (var m in userTest[calc]) {
-            if (userTest[calc].hasOwnProperty(m)) {
-                userTest.qstDone += 1;
-            }
-        }
-
-        // Showing number of unanswered in header.
-        headerMsg = userTest.local.header + " " + (userTest.qstAmount - userTest.qstDone);
-
         // If all questions are answered
-        if (userTest.qstAmount == userTest.qstDone) {
-            // Change header text
-            headerMsg = userTest.local["resultHeader"];
-            testHeader.text(headerMsg);
-
-            // Hide progressbar =)
-            progressbar.hide();
-
+        if (userTest.isAllAnswered()) {
             // Render result page
-            userTest.result();
-        }
-
-        if (testHeader.length > 0) {
-            testHeader.fadeOut('fast', function () {
-                $(this).text(headerMsg).fadeIn('fast');
-            });
-
-            // Updating progress bar animation here
-            $("#progresscol").animate({
-                width: 100 - (userTest.qstAmount - userTest.qstDone) / (userTest.qstAmount / 100) + "%"
-            });
-        } else {
-            testHeader.append($(document.createElement("h2")).text(headerMsg));
-
-            $("#progresscol").css({
-                'width': '0'
-            });
+            userTest.showResult();
         }
     },
+
 
     /**
      *  Calculating result.
      *  Choosing result variant.
      *  Building results page.
      */
-    result: function () {
-        var variant, result;
+    showResult: function () {
 
         switch (userTest.settings.calculation) {
-            case "popular":
+            case quizConstants.calculation.POPULAR:
             {
-                result = {};
-
-                for (variant in userTest["popular"]) {
-                    if (userTest["popular"].hasOwnProperty(variant)) {
-                        result[userTest["popular"][variant]] ? result[userTest["popular"][variant]] += 1 : result[userTest["popular"][variant]] = 1;
-                    }
-                }
-
-                var max = 0;
-
-                for (var v in result) {
-                    if (result.hasOwnProperty(v)) {
-                        if (result[v] > max) {
-                            max = result[v];
-                            variant = v;
-                        }
-                    }
-                }
-
-                userTest.resultVariantObject = userTest.localAnsw[variant]; // Choosing what result to show
-
+                userTest.resultVariant = userTest.calculateResult.popular();
             }
                 break;
 
-            case "score":
+            case quizConstants.calculation.SCORE:
             {
-                result = 0;
-
-                for (var s in userTest.score) {
-                    if (userTest.score.hasOwnProperty(s)) {
-                        result += parseInt(userTest.score[s]);
-                    }
-                }
-
-                for (variant in userTest.localAnsw) {
-                    if (userTest.localAnsw.hasOwnProperty(variant)) {
-                        if (result >= userTest.localAnsw[variant]["minScore"]
-                            && result <= userTest.localAnsw[variant]["maxScore"]) {
-                            // Choosing what result to show
-                            userTest.resultVariantObject = userTest.localAnsw[variant];
-                        }
-                    }
-                }
-
+                userTest.resultVariant = userTest.calculateResult.score();
             }
                 break;
 
-            case "comb":
+            case quizConstants.calculation.COMB:
             {
-                result = "";
-
-                for (var t in userTest.comb) {
-                    if (userTest.comb.hasOwnProperty(t)) {
-                        result += userTest.comb[t];
-                    }
-                }
-
-                for (variant in userTest.localAnsw) {
-                    if (userTest.localAnsw.hasOwnProperty(variant)) {
-                        if (result == userTest.localAnsw[variant].comb) {
-                            userTest.resultVariantObject = userTest.localAnsw[variant]; // Choosing what result to show
-                        }
-                    }
-                }
-            }
-                break;
-        }
-
-        // Saving result in object for future generations and giant space ants.
-        userTest.resultVariant = variant;
-
-        // Checking if variant was found. If not - apply default or throw error.
-        userTest.doResultCheck();
-
-        var resultNode;
-
-        // Depending on settings redirect, silently submit result or show result page.
-        switch (userTest.settings.resultPage) {
-
-            case "HTMLPage":
-            {
-
-                if (!userTest.resultVariantObject.HTMLPage) {
-                    throw "Exception: [HTMLPage] is current result rendering setting, " +
-                        "but no source set in data file '" + userTest.settings.dataSource + "'";
-                }
-
-                // Making GET request to get quiz data
-                $.get(userTest.resultVariantObject.HTMLPage, function (data) {
-                    resultNode = $(data).filter("#resultNode").html();
-
-                    // Remove result header, questions node, append result node
-                    userTest.targetDiv.fadeOut('fast', function () {
-                        $(this).find('#testHeaderH2').remove();
-                        $(this).find('#testBodyDiv').remove();
-
-                        if (resultNode == undefined) {
-                            throw "Exception: HTML result page '" + userTest.resultVariantObject.HTMLPage
-                                + "' is not accessible or doesn't have DIV with id='resultNode'";
-                        }
-
-                        // Inserting parsed HTML from result HTMLPage source
-                        $(this).append(resultNode);
-                        $(this).fadeIn('fast');
-                    });
-
-                });
-
-                //Submitting data for stat
-                $.post(userTest.settings.formListener, {
-                    result: userTest.resultVariant
-                });
-
-            }
-                break;
-
-            case "redirect":
-            {
-                //Submitting data for stat
-                $.post(userTest.settings.formListener, {
-                    result: userTest.resultVariant
-                });
-
-                if (!userTest.resultVariantObject.redirect) {
-                    throw "Exception: [redirect] is current result rendering setting, " +
-                        "but no source set in data file '" + userTest.settings.dataSource + "'";
-                }
-
-                // Note that redirect may be blocked by browser or browser plugins like AdBlock
-                window.location = userTest.resultVariantObject.redirect;
-            }
-                break;
-
-            case "silent":
-            {
-                // Answer text after submitting data
-                resultNode = $(document.createElement("div")).attr('id', 'testResultDiv')
-                    .append($(document.createElement("p")).attr('id', 'testResultP').text(userTest.local["loadingText"]));
-
-                userTest.targetDiv.find('#testHeaderH2').remove();
-                userTest.targetDiv.find('#testBodyDiv').remove(); // Removing DIV with questions and answers
-
-                userTest.targetDiv.append(resultNode);
-
-                // AJAX result submit
-                var params, thanks;
-
-                params = {
-                    result: userTest.resultVariant
-                };
-
-                thanks = function () {
-                    $("#testResultP").text(userTest.local["silentResult"]);
-                };
-
-                $.post(userTest.settings.formListener, params, thanks);
-
-                // Delete test DIV after silent form submit.
-                if (userTest.settings.selfDestruction.enabled) {
-                    function destruction() {
-                        userTest.targetDiv.remove();
-                    }
-
-                    // Sending DIV to the Walhalla in 3, 2, 1...
-                    setTimeout(destruction, userTest.settings.selfDestruction.destructionTimer);
-                }
-
+                userTest.resultVariant = userTest.calculateResult.comb();
             }
                 break;
 
             default:
             {
-                throw "Exception: Result page type unknown: '" + userTest.settings.resultPage + "'.";
+                // we are not going to throw exception here because result variant may be blank,
+                // in this case we need to make additional check if default answers allowed
+            }
+        }
+
+        // Checking if variant was found. If not - apply default or throw error.
+        userTest.doResultCheck();
+
+        //Submitting data for statistics
+        $.post(userTest.settings.formListener, {
+            result: userTest.resultVariant
+        });
+
+        // Depending on settings redirect, silently submit result or show result page.
+        switch (userTest.settings.resultPage) {
+
+            case quizConstants.result.HTML_PAGE:
+            {
+                userTest.renderResult.HTMLPage();
+            }
+                break;
+
+            case quizConstants.result.REDIRECT:
+            {
+                userTest.renderResult.redirect();
+            }
+                break;
+
+            case quizConstants.result.SILENT:
+            {
+                userTest.renderResult.silent();
+            }
+                break;
+
+            default:
+            {
+                throw "Exception: Result page type unknown: '"
+                    + userTest.settings.resultPage + "'.";
             }
         }
     },
@@ -730,10 +611,11 @@ var userTest = {
     },
 
     /**
-     * Toggles visibility =)
+     * Toggles visibility of question when it is clicked.
+     * Finds question wrapper element based on event target.
      * @param event - JS event object
      */
-    toggleVis: function (event) {
+    toggleVisibility: function (event) {
         var currentTarget = event.target;
 
         currentTarget = currentTarget.tagName.toUpperCase() == "INPUT"
@@ -760,13 +642,6 @@ var userTest = {
                 throw errorMessage;
             }
         }
-    },
-
-    /**
-     * Initialization function, should be fired on pageLoad event
-     */
-    init: function () {
-        userTest.getData();
     }
 };
 
@@ -775,4 +650,4 @@ var userTest = {
  * Gently asking jQuery to start function on page load.
  * Everything starts from this line.
  */
-$(userTest.init);
+$(userTest.getData);
