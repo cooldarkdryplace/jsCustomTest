@@ -122,14 +122,14 @@ div.question h3 span {
     transition-property: background-color, color, width, padding-left, padding-right, padding-top, padding-bottom;
     transition-duration: 1s;
     /*transition-delay:1s;*/
-    -webkit-box-shadow:inset -0.2em 0 1em 0 rgba(0, 0, 0, 0.3);
-    box-shadow:inset -0.2em 0 1em 0 rgba(0, 0, 0, 0.3);
+    -webkit-box-shadow: inset -0.2em 0 1em 0 rgba(0, 0, 0, 0.3);
+    box-shadow: inset -0.2em 0 1em 0 rgba(0, 0, 0, 0.3);
 }
 
 div.question h3.answered span {
     background-color: #80b51b;
-    -webkit-box-shadow:inset -0.5em .2em 1em 0 rgba(0, 0, 0, 0.3);
-    box-shadow:inset -0.5em .2em 1em 0 rgba(0, 0, 0, 0.3);
+    -webkit-box-shadow: inset -0.5em .2em 1em 0 rgba(0, 0, 0, 0.3);
+    box-shadow: inset -0.5em .2em 1em 0 rgba(0, 0, 0, 0.3);
 }
 
 div#testResultDiv {
