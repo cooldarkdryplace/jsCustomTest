@@ -34,7 +34,7 @@ var userTest = {
         "formListener": "submit.php",                   // Relative path to server page that listens for result data.
         "targetDiv": "jsCustomTest",                    // Div where quiz will be build
         "showQuestionsOneByOne": {
-            "enabled": true,                            // Show ony current question
+            "enabled": false,                            // Show ony current question
             "mode": quizConstants.questionAnimation.HIDE     // "HIDE" or "COLLAPSE" not active question
         },
         "useDefaultResult": true,                       // If no result was found use default. May be especially useful with calculation "COMB".
@@ -51,19 +51,237 @@ var userTest = {
         }
     },
 
-    // UTILITY FUNCTIONS
-    isAllAnswered: function () {
-        var calc = userTest.settings.calculation;
+    utils: {
+        isAllAnswered: function () {
+            var calc = userTest.settings.calculation;
 
-        // Counting number of answered questions
-        userTest.qstDone = 0;
-        for (var m in userTest[calc]) {
-            if (userTest[calc].hasOwnProperty(m)) {
-                userTest.qstDone += 1;
+            // Counting number of answered questions
+            userTest.qstDone = 0;
+            for (var m in userTest[calc]) {
+                if (userTest[calc].hasOwnProperty(m)) {
+                    userTest.qstDone += 1;
+                }
+            }
+
+            return userTest.qstTotalNumber == userTest.qstDone;
+        },
+
+        isTargetDivPresent: function () {
+            return !(userTest.targetDiv[0] == undefined);
+        },
+
+        validateMinRequiredObjModel: function (localNames, results, questions) {
+            if (localNames.length < 4) {
+                throw "Not all local names are present in JSON source";
+            }
+
+            if (results.length < 1) {
+                throw "Was not able to locate results in JSON source";
+            }
+
+            if (questions.length < 1) {
+                throw "Was not able to locate questions in JSON source";
+            }
+
+            // Check default result presence if we need it
+            if (userTest.settings.useDefaultResult && !userTest.localAnsw["default"]) {
+                throw "Exception: 'useDefaultResult' is set to true " +
+                    "but default result is not present in data file."
+            }
+        },
+
+        doResultCheck: function () {
+            // Checking if variant was found.
+            if (!userTest.resultVariantObject) {
+
+                if (userTest.settings.useDefaultResult) {
+                    userTest.resultVariant = "default";
+                    userTest.resultVariantObject = userTest.localAnsw["default"];
+
+                } else {
+                    var errorMessage = "No result option for such a unique answers combination.";
+
+                    alert(errorMessage);
+                    throw errorMessage;
+                }
+            }
+        },
+
+        /**
+         * Clears DOM and restarts test script
+         * Register an event handler for a button that should restart quiz
+         * Simplest way to create a repeat button is:
+         * <code>
+         *     <button onclick="userTest.restart()">
+         *         Restart
+         *     </button>
+         * </code>
+         */
+        restart: function () {
+            userTest.targetDiv.empty();
+
+            // Clear object
+            userTest[userTest.settings.calculation] = {};
+
+            userTest.place(); // Place all elements one more time
+        },
+
+        /**
+         * Toggles visibility of question when it is clicked.
+         * Finds question wrapper element based on event target.
+         * @param event - JS event object
+         */
+        toggleVisibility: function (event) {
+            var currentTarget = event.target;
+
+            currentTarget = currentTarget.tagName.toUpperCase() == "INPUT"
+                || currentTarget.tagName.toUpperCase() == "LABEL"
+                ? $(currentTarget).parents('.question_wrapper') : $(currentTarget).next('.question_wrapper');
+
+            if (currentTarget.length > 0) {
+                currentTarget.slideToggle();
             }
         }
+    },
 
-        return userTest.qstTotalNumber == userTest.qstDone;
+    createNodes: {
+        createHeader: function () {
+            var h2Node = $(document.createElement("h2")).attr('id', 'testHeaderH2');
+            h2Node.append(userTest.local.name);
+
+            return h2Node;
+        },
+        createProgressBar: function () {
+
+            return $(document.createElement("div")).attr('id', 'progressbar');
+        },
+        createAnswersNode: function (question) {
+            var ulNode = $(document.createElement("ul")).attr('id', question + 'List');
+
+            // Adding question answers and inputs in lists
+            for (var answer in userTest.localQst[question].answers) {
+                if (userTest.localQst[question].answers.hasOwnProperty(answer)) {
+
+                    var questionAnswer = userTest.localQst[question].answers[answer]["answerText"],
+                        labelNode = $(document.createElement("label")),
+                        answerValue;
+
+                    switch (userTest.settings.calculation) {
+                        case quizConstants.calculation.POPULAR:
+                        {
+                            answerValue = userTest.localQst[question].answers[answer].name;
+                        }
+                            break;
+
+                        case quizConstants.calculation.SCORE:
+                        {
+                            answerValue = userTest.localQst[question].answers[answer].score;
+                        }
+                            break;
+
+                        case quizConstants.calculation.COMB:
+                        {
+                            answerValue = userTest.localQst[question].answers[answer].comb;
+                        }
+                            break;
+
+                        default:
+                            throw "Exception: userTest.settings.calculation method is unsupported";
+                    }
+
+                    var answerID = question + "_" + answer,
+                        inputNode = $(document.createElement("input")).attr({
+                            'type': 'radio',
+                            'name': question,
+                            'value': answerValue,
+                            'id': answerID
+                        });
+
+                    // Registering event handler
+                    $(inputNode).on("click", userTest.analyze).on("click", userTest.utils.toggleVisibility);
+
+                    labelNode.text(questionAnswer).attr('for', answerID);
+
+                    var liNode = $(document.createElement("li")).append(inputNode).append(labelNode);
+
+                    ulNode.append(liNode);
+                }
+            }
+
+            return ulNode;
+        },
+        createSingleQuestion: function (question, qstNumber) {
+            var qstDiv = $(document.createElement("div")).attr('id', question);
+
+            // Adding className to current qstDiv
+            var cssClassesArray = [];
+            cssClassesArray.push("question", qstNumber % 2 == 0 ? "questionOdd" : "questionEven");
+
+            if (qstNumber == 1) {
+                cssClassesArray.push("questionFirst");
+            } else if (qstNumber == userTest.qstTotalNumber) {
+                cssClassesArray.push("questionLast");
+            }
+
+            qstDiv.addClass(cssClassesArray.join(' '));
+
+            // Generate question number and question text nodes
+            var qstNumSpan = $(document.createElement("span")).append(qstNumber + '.');
+            qstDiv.append($(document.createElement("h3")).text(userTest.localQst[question].questionText)
+                .prepend(qstNumSpan).on("click", userTest.utils.toggleVisibility));
+
+            var qstWrapper = $(document.createElement('div')).addClass('question_wrapper');
+
+            if (userTest.settings.showQuestionsOneByOne.enabled && qstNumber != 1) {
+
+                switch (userTest.settings.showQuestionsOneByOne.mode) {
+                    case quizConstants.questionAnimation.COLLAPSE:
+                    {
+                        qstWrapper.css("display", "none");
+                    }
+                        break;
+                    case quizConstants.questionAnimation.HIDE:
+                    {
+                        qstDiv.css("display", "none");
+                    }
+                        break;
+                    default:
+                    {
+                        throw "Exception: unknown mode in 'userTest.settings.showQuestionsOneByOne.mode'";
+                    }
+                }
+            }
+
+            // Insert question picture if present.
+            if (typeof (userTest.localQst[question].pictureSource) != 'undefined') {
+                qstWrapper.append($(document.createElement("img")).attr('src', userTest.localQst[question].pictureSource));
+            }
+
+            var ulNode = userTest.createNodes.createAnswersNode(question);
+
+            qstWrapper.append(ulNode);
+            qstDiv.append(qstWrapper);
+
+            return qstDiv;
+        },
+        createQuestions: function () {
+            var testBodyDiv = $(document.createElement("div")).attr('id', 'testBodyDiv'),
+                qstNumber = 0;
+
+            for (var question in userTest.localQst) {
+                if (!userTest.localQst.hasOwnProperty(question)) {
+                    continue;
+                }
+
+                // Counting number of questions in order to assign proper CSS classes and header prefixes.
+                qstNumber += 1;
+                var qstDiv = userTest.createNodes.createSingleQuestion(question, qstNumber);
+
+                testBodyDiv.append(qstDiv);
+            }
+
+            return testBodyDiv;
+        }
     },
 
     updateView: {
@@ -71,7 +289,7 @@ var userTest = {
             var testHeader = $("#testHeaderH2"),
                 headerMsg;
 
-            if (userTest.isAllAnswered()) {
+            if (userTest.utils.isAllAnswered()) {
                 headerMsg = userTest.local["resultHeader"];
             } else {
                 headerMsg = userTest.local.header + " " + (userTest.qstTotalNumber - userTest.qstDone);
@@ -104,7 +322,7 @@ var userTest = {
                 width: (100 - (userTest.qstTotalNumber - userTest.qstDone) / (userTest.qstTotalNumber / 100)) + "%"
             });
 
-            if (userTest.isAllAnswered()) {
+            if (userTest.utils.isAllAnswered()) {
                 progressbar.hide();
             }
         },
@@ -300,8 +518,6 @@ var userTest = {
         }
     },
 
-    // MAIN LOGIC
-
     /**
      * Method is used for:
      * 1) Loading file with quiz data from server using AJAX.
@@ -309,31 +525,26 @@ var userTest = {
      * 3) Filling global object userTest with extracted data.
      */
     getData: function () {
-        userTest.local = {};
-        userTest.localAnsw = {};
-        userTest.localQst = [];
-        userTest.targetDiv = $('#' + userTest.settings.targetDiv);
-
-        if (userTest.targetDiv[0] == undefined) {
-            throw "Exception: Can not find DIV to render quiz. " +
-                "Current setting is: 'targetDiv': '" + userTest.settings.targetDiv + "'.";
-        }
-
-        // Making GET request to get quiz data
-        $.get(userTest.settings.dataSource, function (data) {
-            parse(data)
-        }, "json");
-
-
         /**
-         * Function that fills in global object userTest with data.
+         * Function that fills-in global object userTest with data.
          * @param doc - requested and hopefully downloaded quiz data
          */
         function parse(doc) {
+            userTest.targetDiv = $('#' + userTest.settings.targetDiv);
 
-            userTest.local = doc["test"].local;
-            userTest.localQst = doc["test"]["questions"];
+            // First of all check if there is a place where we will deploy quiz
+            if (!userTest.utils.isTargetDivPresent()) {
+                throw "Exception: Can not find DIV to render quiz. " +
+                    "Current setting is: 'targetDiv': '" + userTest.settings.targetDiv + "'.";
+            }
+
+            userTest.local = doc["test"]["local"];
             userTest.localAnsw = doc["test"]["results"];
+            userTest.localQst = doc["test"]["questions"];
+
+            // Make a simple validation to see if needed data is present in source
+            userTest.utils.validateMinRequiredObjModel(
+                userTest.local, userTest.localAnsw, userTest.localQst);
 
             // Calculate number of questions
             userTest.qstTotalNumber = 0;
@@ -344,14 +555,14 @@ var userTest = {
                 }
             }
 
-            // Check default result presence if we need it
-            if (userTest.settings.useDefaultResult && !userTest.localAnsw["default"]) {
-                throw "Exception: 'useDefaultResult' is set to true but default result is not present in data file."
-            }
-
             // Render quiz HTML page
             userTest.place();
         }
+
+        // Making GET request to get quiz data
+        $.get(userTest.settings.dataSource, function (data) {
+            parse(data)
+        }, "json");
     },
 
     /**
@@ -360,137 +571,19 @@ var userTest = {
      * Appends fragment
      * Registers events
      */
-    place: function () { // Generating HTML with questions and answers
-        var testBodyDiv = $(document.createElement("div")).attr('id', 'testBodyDiv'),
-            progressbar = $(document.createElement("div")).attr('id', 'progressbar'),
-            fragment = $(document.createDocumentFragment()),
-            testName = userTest.local.name,
-            qstNumber = 0;
+    place: function () {
+        // Generating HTML with questions and answers
+        var fragment = $(document.createDocumentFragment()),
+            quizHeader = userTest.createNodes.createHeader(),
+            progressbar = userTest.createNodes.createProgressBar(),
+            testBodyDiv = userTest.createNodes.createQuestions();
 
-        // Adding and inserting HTML nodes into DOM
-        for (var question in userTest.localQst) {
-            if (!userTest.localQst.hasOwnProperty(question)) {
-                continue;
-            }
-
-            qstNumber += 1; // Counting number of questions.
-            var qstDiv = $(document.createElement("div")).attr('id', question);
-
-            // Adding className to current qstDiv
-            var classArray = [];
-            classArray.push("question", qstNumber % 2 == 0 ? "questionOdd" : "questionEven");
-
-            if (qstNumber == 1) {
-                classArray.push("questionFirst");
-            } else if (qstNumber == userTest.qstTotalNumber) {
-                classArray.push("questionLast");
-            }
-
-            qstDiv.addClass(classArray.join(' '));
-
-            // Generate question number and question text nodes
-            var qstNumSpan = $(document.createElement("span")).append(qstNumber + '.');
-            qstDiv.append($(document.createElement("h3")).text(userTest.localQst[question].questionText)
-                .prepend(qstNumSpan).on("click", userTest.toggleVisibility));
-
-            var qstWrapper = $(document.createElement('div')).addClass('question_wrapper');
-
-            if (userTest.settings.showQuestionsOneByOne.enabled && qstNumber != 1) {
-
-                switch (userTest.settings.showQuestionsOneByOne.mode) {
-                    case quizConstants.questionAnimation.COLLAPSE:
-                    {
-                        qstWrapper.css("display", "none");
-                    }
-                        break;
-                    case quizConstants.questionAnimation.HIDE:
-                    {
-                        qstDiv.css("display", "none");
-                    }
-                        break;
-                    default:
-                    {
-                        throw "Exception: unknown mode in 'userTest.settings.showQuestionsOneByOne.mode'";
-                    }
-                }
-            }
-
-            // Insert question picture if present.
-            if (typeof (userTest.localQst[question].pictureSource) != 'undefined') {
-                qstWrapper.append($(document.createElement("img")).attr('src', userTest.localQst[question].pictureSource));
-            }
-
-            testBodyDiv.append(qstDiv);
-
-            var ulNode = $(document.createElement("ul")).attr('id', question + 'List');
-
-            qstWrapper.append(ulNode);
-
-            qstDiv.append(qstWrapper);
-
-
-            // Adding question answers and inputs in lists
-            for (var answer in userTest.localQst[question].answers) {
-                if (userTest.localQst[question].answers.hasOwnProperty(answer)) {
-
-                    var questionAnswer = userTest.localQst[question].answers[answer]["answerText"],
-                        labelNode = $(document.createElement("label")),
-                        inputNode = null,
-                        answerValue;
-
-                    switch (userTest.settings.calculation) {
-                        case quizConstants.calculation.POPULAR:
-                        {
-                            answerValue = userTest.localQst[question].answers[answer].name;
-                        }
-                            break;
-
-                        case quizConstants.calculation.SCORE:
-                        {
-                            answerValue = userTest.localQst[question].answers[answer].score;
-                        }
-                            break;
-
-                        case quizConstants.calculation.COMB:
-                        {
-                            answerValue = userTest.localQst[question].answers[answer].comb;
-                        }
-                            break;
-
-                        default:
-                            throw "Exception: userTest.settings.calculation method is unsupported";
-                    }
-
-                    var answerID = question + "_" + answer;
-
-                    if (!inputNode) {
-                        inputNode = $(document.createElement("input")).attr({
-                            'type': 'radio',
-                            'name': question,
-                            'value': answerValue,
-                            'id': answerID
-                        });
-                    }
-
-                    // Registering event handler
-                    $(inputNode).on("click", userTest.analyze).on("click", userTest.toggleVisibility);
-
-                    labelNode.text(questionAnswer).attr('for', answerID);
-
-                    var liNode = $(document.createElement("li")).append(inputNode).append(labelNode);
-
-                    ulNode.append(liNode);
-                }
-            }
-        }
-
-        var h2Node = $(document.createElement("h2")).attr('id', 'testHeaderH2');
-        h2Node.append(testName);
-
-        fragment.append(h2Node).append(progressbar).append(testBodyDiv);
-
-        userTest.targetDiv.append(fragment); // Append documentFragment childes to DOM
+        // Adding generated nodes to document fragment.
+        fragment.append(quizHeader).append(progressbar).append(testBodyDiv);
+        // Appending results to DOM
+        userTest.targetDiv.append(fragment);
     },
+
     /**
      * Method is used to calculate result depending on algorithm
      * Event handler. Calculates answered questions.
@@ -498,8 +591,6 @@ var userTest = {
      * @param event - JS event object
      */
     analyze: function (event) {
-        userTest.updateView.questionNode(event);
-
         /**
          * Creating a global object that will keep all answers values.
          * Depending on calculation settings we will look for "name", "score" or "comb" attributes.
@@ -507,14 +598,15 @@ var userTest = {
         var calc = userTest.settings.calculation;
 
         if (!userTest[calc]) {
-            //Init if never used before.
+            // Init if never used before.
             userTest[calc] = {};
         }
-
         userTest[calc][this.name] = this.value;
 
+        userTest.updateView.questionNode(event);
+
         // If all questions are answered
-        if (userTest.isAllAnswered()) {
+        if (userTest.utils.isAllAnswered()) {
             // Render result page
             userTest.showResult();
         }
@@ -527,7 +619,6 @@ var userTest = {
      *  Building results page.
      */
     showResult: function () {
-
         switch (userTest.settings.calculation) {
             case quizConstants.calculation.POPULAR:
             {
@@ -554,17 +645,17 @@ var userTest = {
             }
         }
 
-        // Checking if variant was found. If not - apply default or throw error.
-        userTest.doResultCheck();
+        // Checking if variant was found.
+        // If not - apply default or throw error.
+        userTest.utils.doResultCheck();
 
         //Submitting data for statistics
         $.post(userTest.settings.formListener, {
             result: userTest.resultVariant
         });
 
-        // Depending on settings redirect, silently submit result or show result page.
+        // Depending on settings: redirect, silently submit result or show result page.
         switch (userTest.settings.resultPage) {
-
             case quizConstants.result.HTML_PAGE:
             {
                 userTest.renderResult.HTMLPage();
@@ -587,59 +678,6 @@ var userTest = {
             {
                 throw "Exception: Result page type unknown: '"
                     + userTest.settings.resultPage + "'.";
-            }
-        }
-    },
-
-    /**
-     * Clears DOM and restarts test script
-     * Register an event handler for a button that should restart quiz
-     * Simplest way to create a repeat button is:
-     * <code>
-     *     <button onclick="userTest.restart()">
-     *         Restart
-     *     </button>
-     * </code>
-     */
-    restart: function () {
-        userTest.targetDiv.empty();
-
-        // Clear object
-        userTest[userTest.settings.calculation] = {};
-
-        userTest.place(); // Place all elements one more time
-    },
-
-    /**
-     * Toggles visibility of question when it is clicked.
-     * Finds question wrapper element based on event target.
-     * @param event - JS event object
-     */
-    toggleVisibility: function (event) {
-        var currentTarget = event.target;
-
-        currentTarget = currentTarget.tagName.toUpperCase() == "INPUT"
-            || currentTarget.tagName.toUpperCase() == "LABEL"
-            ? $(currentTarget).parents('.question_wrapper') : $(currentTarget).next('.question_wrapper');
-
-        if (currentTarget.length > 0) {
-            currentTarget.slideToggle();
-        }
-    },
-
-    doResultCheck: function () {
-        // Checking if variant was found.
-        if (!userTest.resultVariantObject) {
-
-            if (userTest.settings.useDefaultResult) {
-                userTest.resultVariant = "default";
-                userTest.resultVariantObject = userTest.localAnsw["default"];
-
-            } else {
-                var errorMessage = "No result option for such a unique answers combination.";
-
-                alert(errorMessage);
-                throw errorMessage;
             }
         }
     }
