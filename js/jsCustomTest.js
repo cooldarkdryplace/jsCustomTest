@@ -4,7 +4,7 @@
  * Date: 12/1/13
  * Time: 4:22 PM
  */
-/*global $, document, window, setTimeout */
+/*global $, document, window, setTimeout*/
 
 var quizConstants = {
     result: {
