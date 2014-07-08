@@ -4,6 +4,7 @@
  * Date: 12/1/13
  * Time: 4:22 PM
  */
+/*global $, document, window, setTimeout */
 
 var quizConstants = {
     result: {
@@ -34,7 +35,7 @@ var userTest = {
         "formListener": "submit.php",                   // Relative path to server page that listens for result data.
         "targetDiv": "jsCustomTest",                    // Div where quiz will be build
         "showQuestionsOneByOne": {
-            "enabled": false,                            // Show ony current question
+            "enabled": true,                            // Show ony current question
             "mode": quizConstants.questionAnimation.HIDE     // "HIDE" or "COLLAPSE" not active question
         },
         "useDefaultResult": true,                       // If no result was found use default. May be especially useful with calculation "COMB".
@@ -53,24 +54,28 @@ var userTest = {
 
     utils: {
         isAllAnswered: function () {
-            var calc = userTest.settings.calculation;
+            "use strict";
+            var calc = userTest.settings.calculation,
+                answer;
 
             // Counting number of answered questions
             userTest.qstDone = 0;
-            for (var m in userTest[calc]) {
-                if (userTest[calc].hasOwnProperty(m)) {
+            for (answer in userTest[calc]) {
+                if (userTest[calc].hasOwnProperty(answer)) {
                     userTest.qstDone += 1;
                 }
             }
 
-            return userTest.qstTotalNumber == userTest.qstDone;
+            return userTest.qstTotalNumber === userTest.qstDone;
         },
 
         isTargetDivPresent: function () {
-            return !(userTest.targetDiv[0] == undefined);
+            "use strict";
+            return userTest.targetDiv[0] !== undefined;
         },
 
         validateMinRequiredObjModel: function (localNames, results, questions) {
+            "use strict";
             if (localNames.length < 4) {
                 throw "Not all local names are present in JSON source";
             }
@@ -86,23 +91,19 @@ var userTest = {
             // Check default result presence if we need it
             if (userTest.settings.useDefaultResult && !userTest.localAnsw["default"]) {
                 throw "Exception: 'useDefaultResult' is set to true " +
-                    "but default result is not present in data file."
+                    "but default result is not present in data file.";
             }
         },
 
         doResultCheck: function () {
+            "use strict";
             // Checking if variant was found.
             if (!userTest.resultVariantObject) {
-
                 if (userTest.settings.useDefaultResult) {
                     userTest.resultVariant = "default";
                     userTest.resultVariantObject = userTest.localAnsw["default"];
-
                 } else {
-                    var errorMessage = "No result option for such a unique answers combination.";
-
-                    alert(errorMessage);
-                    throw errorMessage;
+                    throw "No result option for such a unique answers combination.";
                 }
             }
         },
@@ -118,6 +119,7 @@ var userTest = {
          * </code>
          */
         restart: function () {
+            "use strict";
             userTest.targetDiv.empty();
 
             // Clear object
@@ -132,11 +134,12 @@ var userTest = {
          * @param event - JS event object
          */
         toggleVisibility: function (event) {
+            "use strict";
             var currentTarget = event.target;
 
-            currentTarget = currentTarget.tagName.toUpperCase() == "INPUT"
-                || currentTarget.tagName.toUpperCase() == "LABEL"
-                ? $(currentTarget).parents('.question_wrapper') : $(currentTarget).next('.question_wrapper');
+            currentTarget = currentTarget.tagName.toUpperCase() === "INPUT" ||
+                currentTarget.tagName.toUpperCase() === "LABEL" ?
+                $(currentTarget).parents('.question_wrapper') : $(currentTarget).next('.question_wrapper');
 
             if (currentTarget.length > 0) {
                 currentTarget.slideToggle();
@@ -146,64 +149,64 @@ var userTest = {
 
     createNodes: {
         createHeader: function () {
+            "use strict";
             var h2Node = $(document.createElement("h2")).attr('id', 'testHeaderH2');
             h2Node.append(userTest.local.name);
 
             return h2Node;
         },
         createProgressBar: function () {
-
+            "use strict";
             return $(document.createElement("div")).attr('id', 'progressbar');
         },
         createAnswersNode: function (question) {
-            var ulNode = $(document.createElement("ul")).attr('id', question + 'List');
+            "use strict";
+            var ulNode = $(document.createElement("ul")).attr('id', question + 'List'),
+                answer,
+                questionAnswer,
+                labelNode,
+                answerValue,
+                answerID,
+                inputNode,
+                liNode;
 
             // Adding question answers and inputs in lists
-            for (var answer in userTest.localQst[question].answers) {
+            for (answer in userTest.localQst[question].answers) {
                 if (userTest.localQst[question].answers.hasOwnProperty(answer)) {
 
-                    var questionAnswer = userTest.localQst[question].answers[answer]["answerText"],
-                        labelNode = $(document.createElement("label")),
-                        answerValue;
+                    questionAnswer = userTest.localQst[question].answers[answer].answerText;
+                    labelNode = $(document.createElement("label"));
 
                     switch (userTest.settings.calculation) {
                         case quizConstants.calculation.POPULAR:
-                        {
                             answerValue = userTest.localQst[question].answers[answer].name;
-                        }
                             break;
 
                         case quizConstants.calculation.SCORE:
-                        {
                             answerValue = userTest.localQst[question].answers[answer].score;
-                        }
                             break;
 
                         case quizConstants.calculation.COMB:
-                        {
                             answerValue = userTest.localQst[question].answers[answer].comb;
-                        }
                             break;
 
                         default:
                             throw "Exception: userTest.settings.calculation method is unsupported";
                     }
 
-                    var answerID = question + "_" + answer,
-                        inputNode = $(document.createElement("input")).attr({
-                            'type': 'radio',
-                            'name': question,
-                            'value': answerValue,
-                            'id': answerID
-                        });
+                    answerID = question + "_" + answer;
+                    inputNode = $(document.createElement("input")).attr({
+                        'type': 'radio',
+                        'name': question,
+                        'value': answerValue,
+                        'id': answerID
+                    });
 
                     // Registering event handler
                     $(inputNode).on("click", userTest.analyze).on("click", userTest.utils.toggleVisibility);
 
                     labelNode.text(questionAnswer).attr('for', answerID);
-
-                    var liNode = $(document.createElement("li")).append(inputNode).append(labelNode);
-
+                    liNode = $(document.createElement("li")).append(inputNode).append(labelNode);
                     ulNode.append(liNode);
                 }
             }
@@ -211,53 +214,50 @@ var userTest = {
             return ulNode;
         },
         createSingleQuestion: function (question, qstNumber) {
-            var qstDiv = $(document.createElement("div")).attr('id', question);
+            "use strict";
+            var qstDiv = $(document.createElement("div")).attr('id', question),
+                cssClassesArray = [],
+                qstNumSpan,
+                qstWrapper,
+                ulNode;
 
-            // Adding className to current qstDiv
-            var cssClassesArray = [];
-            cssClassesArray.push("question", qstNumber % 2 == 0 ? "questionOdd" : "questionEven");
+            cssClassesArray.push("question", qstNumber % 2 === 0 ? "questionOdd" : "questionEven");
 
-            if (qstNumber == 1) {
+            if (qstNumber === 1) {
                 cssClassesArray.push("questionFirst");
-            } else if (qstNumber == userTest.qstTotalNumber) {
+            } else if (qstNumber === userTest.qstTotalNumber) {
                 cssClassesArray.push("questionLast");
             }
 
             qstDiv.addClass(cssClassesArray.join(' '));
 
             // Generate question number and question text nodes
-            var qstNumSpan = $(document.createElement("span")).append(qstNumber + '.');
+            qstNumSpan = $(document.createElement("span")).append(qstNumber + '.');
             qstDiv.append($(document.createElement("h3")).text(userTest.localQst[question].questionText)
                 .prepend(qstNumSpan).on("click", userTest.utils.toggleVisibility));
 
-            var qstWrapper = $(document.createElement('div')).addClass('question_wrapper');
+            qstWrapper = $(document.createElement('div')).addClass('question_wrapper');
 
-            if (userTest.settings.showQuestionsOneByOne.enabled && qstNumber != 1) {
+            if (userTest.settings.showQuestionsOneByOne.enabled && qstNumber !== 1) {
 
                 switch (userTest.settings.showQuestionsOneByOne.mode) {
                     case quizConstants.questionAnimation.COLLAPSE:
-                    {
                         qstWrapper.css("display", "none");
-                    }
                         break;
                     case quizConstants.questionAnimation.HIDE:
-                    {
                         qstDiv.css("display", "none");
-                    }
                         break;
                     default:
-                    {
                         throw "Exception: unknown mode in 'userTest.settings.showQuestionsOneByOne.mode'";
-                    }
                 }
             }
 
             // Insert question picture if present.
-            if (typeof (userTest.localQst[question].pictureSource) != 'undefined') {
+            if (typeof (userTest.localQst[question].pictureSource) !== "undefined") {
                 qstWrapper.append($(document.createElement("img")).attr('src', userTest.localQst[question].pictureSource));
             }
 
-            var ulNode = userTest.createNodes.createAnswersNode(question);
+            ulNode = userTest.createNodes.createAnswersNode(question);
 
             qstWrapper.append(ulNode);
             qstDiv.append(qstWrapper);
@@ -265,19 +265,20 @@ var userTest = {
             return qstDiv;
         },
         createQuestions: function () {
+            "use strict";
             var testBodyDiv = $(document.createElement("div")).attr('id', 'testBodyDiv'),
-                qstNumber = 0;
+                qstNumber = 0,
+                question,
+                qstDiv;
 
-            for (var question in userTest.localQst) {
-                if (!userTest.localQst.hasOwnProperty(question)) {
-                    continue;
+            for (question in userTest.localQst) {
+                if (userTest.localQst.hasOwnProperty(question)) {
+                    // Counting number of questions in order to assign proper CSS classes and header prefixes.
+                    qstNumber += 1;
+                    qstDiv = userTest.createNodes.createSingleQuestion(question, qstNumber);
+
+                    testBodyDiv.append(qstDiv);
                 }
-
-                // Counting number of questions in order to assign proper CSS classes and header prefixes.
-                qstNumber += 1;
-                var qstDiv = userTest.createNodes.createSingleQuestion(question, qstNumber);
-
-                testBodyDiv.append(qstDiv);
             }
 
             return testBodyDiv;
@@ -286,18 +287,19 @@ var userTest = {
 
     updateView: {
         headerNode: function () {
+            "use strict";
             var testHeader = $("#testHeaderH2"),
                 headerMsg;
 
             if (userTest.utils.isAllAnswered()) {
-                headerMsg = userTest.local["resultHeader"];
+                headerMsg = userTest.local.resultHeader;
             } else {
                 headerMsg = userTest.local.header + " " + (userTest.qstTotalNumber - userTest.qstDone);
             }
 
             testHeader.text(headerMsg);
 
-            if (testHeader.length == 0) {
+            if (testHeader.length === 0) {
                 testHeader.append($(document.createElement("h2")).text(headerMsg));
             } else {
                 testHeader.fadeOut('fast', function () {
@@ -308,11 +310,12 @@ var userTest = {
         },
 
         progressBarNode: function () {
+            "use strict";
             var progressbar = $("#progressbar"),
                 progressColumn = $("#progresscol");
 
             // If progressbar is not shown then we will show it.
-            if (progressColumn.length == 0) {
+            if (progressColumn.length === 0) {
                 progressbar.append($(document.createElement("div")).attr('id', 'progresscol').animate({
                     width: (100 - (userTest.qstTotalNumber - userTest.qstDone) / (userTest.qstTotalNumber / 100)) + "%"
                 }));
@@ -328,6 +331,8 @@ var userTest = {
         },
 
         questionNode: function (event) {
+            "use strict";
+            var questionNode = $("#" + $(event.target).closest('.question')[0].id);
             // If input clicked - Marking target H3 with className "answered"
             // Searching for header tag.
             $(event.target).closest('.question').find('h3:first').addClass('answered');
@@ -337,22 +342,14 @@ var userTest = {
                 // Find next question content and show it
                 switch (userTest.settings.showQuestionsOneByOne.mode) {
                     case quizConstants.questionAnimation.COLLAPSE:
-                    {
-                        $("#" + $(event.target).closest('.question')[0].id)
-                            .next().find('.question_wrapper').slideDown();
-                    }
+                        questionNode.next().find('.question_wrapper').slideDown();
                         break;
                     case quizConstants.questionAnimation.HIDE:
-                    {
-                        $("#" + $(event.target).closest('.question')[0].id)
-                            .next('.question').slideDown();
-                    }
+                        questionNode.next('.question').slideDown();
                         break;
                     default:
-                    {
-                        throw "Show questions 'one by one' is enabled but wrong mode is set: "
-                            + userTest.settings.showQuestionsOneByOne.mode;
-                    }
+                        throw "Show questions 'one by one' is enabled but wrong mode is set: " +
+                            userTest.settings.showQuestionsOneByOne.mode;
                 }
             }
 
@@ -362,21 +359,26 @@ var userTest = {
 
     calculateResult: {
         popular: function () {
+            "use strict";
             var result = {},
                 popular = userTest[quizConstants.calculation.POPULAR],
-                variant;
+                variant,
+                max,
+                v;
 
             for (variant in popular) {
                 if (popular.hasOwnProperty(variant)) {
-                    result[popular[variant]] ?
-                        result[popular[variant]] += 1
-                        : result[popular[variant]] = 1;
+                    if (result[popular[variant]]) {
+                        result[popular[variant]] += 1;
+                    } else {
+                        result[popular[variant]] = 1;
+                    }
                 }
             }
 
-            var max = 0;
+            max = 0;
 
-            for (var v in result) {
+            for (v in result) {
                 if (result.hasOwnProperty(v)) {
                     if (result[v] > max) {
                         max = result[v];
@@ -392,19 +394,22 @@ var userTest = {
         },
 
         score: function () {
+            "use strict";
             var result = 0,
-                score = userTest[quizConstants.calculation.SCORE];
+                score = userTest[quizConstants.calculation.SCORE],
+                answer,
+                variant;
 
-            for (var answer in score) {
+            for (answer in score) {
                 if (score.hasOwnProperty(answer)) {
-                    result += parseInt(score[answer]);
+                    result += parseInt(score[answer], 10);
                 }
             }
 
-            for (var variant in userTest.localAnsw) {
+            for (variant in userTest.localAnsw) {
                 if (userTest.localAnsw.hasOwnProperty(variant)) {
-                    if (result >= userTest.localAnsw[variant]["minScore"]
-                        && result <= userTest.localAnsw[variant]["maxScore"]) {
+                    if (result >= userTest.localAnsw[variant].minScore &&
+                        result <= userTest.localAnsw[variant].maxScore) {
                         // Result to show
                         userTest.resultVariantObject = userTest.localAnsw[variant];
 
@@ -415,11 +420,13 @@ var userTest = {
         },
 
         comb: function () {
+            "use strict";
             var result = "",
                 comb = userTest[quizConstants.calculation.COMB],
-                variant;
+                variant,
+                answer;
 
-            for (var answer in comb) {
+            for (answer in comb) {
                 if (comb.hasOwnProperty(answer)) {
                     result += comb[answer];
                 }
@@ -427,7 +434,7 @@ var userTest = {
 
             for (variant in userTest.localAnsw) {
                 if (userTest.localAnsw.hasOwnProperty(variant)) {
-                    if (result == userTest.localAnsw[variant].comb) {
+                    if (result === userTest.localAnsw[variant].comb) {
                         // Result to show
                         userTest.resultVariantObject = userTest.localAnsw[variant];
                     }
@@ -440,7 +447,7 @@ var userTest = {
 
     renderResult: {
         HTMLPage: function () {
-
+            "use strict";
             if (!userTest.resultVariantObject.HTMLPage) {
                 throw "Exception: [HTMLPage] is current result rendering setting, " +
                     "but no source set in data file '" + userTest.settings.dataSource + "'";
@@ -455,9 +462,9 @@ var userTest = {
                     $(this).find('#testHeaderH2').remove();
                     $(this).find('#testBodyDiv').remove();
 
-                    if (resultNode == undefined) {
-                        throw "Exception: HTML result page '" + userTest.resultVariantObject.HTMLPage
-                            + "' is not accessible or doesn't have DIV with id='resultNode'";
+                    if (resultNode === undefined) {
+                        throw "Exception: HTML result page '" + userTest.resultVariantObject.HTMLPage +
+                            "' is not accessible or doesn't have DIV with id='resultNode'";
                     }
 
                     // Inserting parsed HTML from result HTMLPage source
@@ -474,19 +481,24 @@ var userTest = {
         },
 
         redirect: function () {
+            "use strict";
             if (!userTest.resultVariantObject.redirect) {
                 throw "Exception: [redirect] is current result rendering setting, " +
                     "but no source set in data file '" + userTest.settings.dataSource + "'";
             }
 
             // Note that redirect may be blocked by browser or browser plugins like AdBlock
-            window.location = userTest.resultVariantObject["redirect"];
+            window.location = userTest.resultVariantObject.redirect;
         },
 
         silent: function () {
+            "use strict";
             // Answer text after submitting data
-            var resultNode = $(document.createElement("div")).attr('id', 'testResultDiv')
-                .append($(document.createElement("p")).attr('id', 'testResultP').text(userTest.local["loadingText"]));
+            var params,
+                thanks,
+                resultNode = $(document.createElement("div")).attr('id', 'testResultDiv')
+                    .append($(document.createElement("p")).attr('id', 'testResultP')
+                        .text(userTest.local.loadingText));
 
             userTest.targetDiv.find('#testHeaderH2').remove();
             userTest.targetDiv.find('#testBodyDiv').remove(); // Removing DIV with questions and answers
@@ -494,26 +506,22 @@ var userTest = {
             userTest.targetDiv.append(resultNode);
 
             // AJAX result submit
-            var params, thanks;
-
             params = {
                 result: userTest.resultVariant
             };
 
             thanks = function () {
-                $("#testResultP").text(userTest.local["silentResult"]);
+                $("#testResultP").text(userTest.local.silentResult);
             };
 
             $.post(userTest.settings.formListener, params, thanks);
 
             // Delete test DIV after silent form submit.
             if (userTest.settings.selfDestruction.enabled) {
-                function destruction() {
-                    userTest.targetDiv.remove();
-                }
-
                 // Sending DIV to the Walhalla in 3, 2, 1...
-                setTimeout(destruction, userTest.settings.selfDestruction.destructionTimer);
+                setTimeout(function () {
+                    userTest.targetDiv.remove();
+                }, userTest.settings.selfDestruction.destructionTimer);
             }
         }
     },
@@ -525,11 +533,13 @@ var userTest = {
      * 3) Filling global object userTest with extracted data.
      */
     getData: function () {
+        "use strict";
         /**
          * Function that fills-in global object userTest with data.
          * @param doc - requested and hopefully downloaded quiz data
          */
         function parse(doc) {
+            var question;
             userTest.targetDiv = $('#' + userTest.settings.targetDiv);
 
             // First of all check if there is a place where we will deploy quiz
@@ -538,19 +548,22 @@ var userTest = {
                     "Current setting is: 'targetDiv': '" + userTest.settings.targetDiv + "'.";
             }
 
-            userTest.local = doc["test"]["local"];
-            userTest.localAnsw = doc["test"]["results"];
-            userTest.localQst = doc["test"]["questions"];
+            userTest.local = doc.test.local;
+            userTest.localAnsw = doc.test.results;
+            userTest.localQst = doc.test.questions;
 
             // Make a simple validation to see if needed data is present in source
             userTest.utils.validateMinRequiredObjModel(
-                userTest.local, userTest.localAnsw, userTest.localQst);
+                userTest.local,
+                userTest.localAnsw,
+                userTest.localQst
+            );
 
             // Calculate number of questions
             userTest.qstTotalNumber = 0;
 
-            for (var i in userTest.localQst) {
-                if (userTest.localQst.hasOwnProperty(i)) {
+            for (question in userTest.localQst) {
+                if (userTest.localQst.hasOwnProperty(question)) {
                     userTest.qstTotalNumber += 1;
                 }
             }
@@ -561,7 +574,7 @@ var userTest = {
 
         // Making GET request to get quiz data
         $.get(userTest.settings.dataSource, function (data) {
-            parse(data)
+            parse(data);
         }, "json");
     },
 
@@ -572,6 +585,7 @@ var userTest = {
      * Registers events
      */
     place: function () {
+        "use strict";
         // Generating HTML with questions and answers
         var fragment = $(document.createDocumentFragment()),
             quizHeader = userTest.createNodes.createHeader(),
@@ -591,7 +605,8 @@ var userTest = {
      * @param event - JS event object
      */
     analyze: function (event) {
-        /**
+        "use strict";
+        /*
          * Creating a global object that will keep all answers values.
          * Depending on calculation settings we will look for "name", "score" or "comb" attributes.
          */
@@ -619,30 +634,19 @@ var userTest = {
      *  Building results page.
      */
     showResult: function () {
+        "use strict";
         switch (userTest.settings.calculation) {
             case quizConstants.calculation.POPULAR:
-            {
                 userTest.resultVariant = userTest.calculateResult.popular();
-            }
                 break;
 
             case quizConstants.calculation.SCORE:
-            {
                 userTest.resultVariant = userTest.calculateResult.score();
-            }
                 break;
 
             case quizConstants.calculation.COMB:
-            {
                 userTest.resultVariant = userTest.calculateResult.comb();
-            }
                 break;
-
-            default:
-            {
-                // we are not going to throw exception here because result variant may be blank,
-                // in this case we need to make additional check if default answers allowed
-            }
         }
 
         // Checking if variant was found.
@@ -657,28 +661,19 @@ var userTest = {
         // Depending on settings: redirect, silently submit result or show result page.
         switch (userTest.settings.resultPage) {
             case quizConstants.result.HTML_PAGE:
-            {
                 userTest.renderResult.HTMLPage();
-            }
                 break;
 
             case quizConstants.result.REDIRECT:
-            {
                 userTest.renderResult.redirect();
-            }
                 break;
 
             case quizConstants.result.SILENT:
-            {
                 userTest.renderResult.silent();
-            }
                 break;
 
             default:
-            {
-                throw "Exception: Result page type unknown: '"
-                    + userTest.settings.resultPage + "'.";
-            }
+                throw "Exception: Result page type unknown: '" + userTest.settings.resultPage + "'.";
         }
     }
 };
